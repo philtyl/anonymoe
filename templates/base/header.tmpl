@@ -14,12 +14,29 @@
     <meta property="og:type" content="website" />
     <meta property="og:title" content="Anonymoe">
     <meta property="og:description" content="Anonymoe is an open source anonymous password-less email client.">
-    <meta property="og:image" content="{{AppURL}}img/anon-lg.png" />
+    <meta property="og:image" content="{{AppURL}}/img/anony-lg.png" />
     <meta property="og:site_name" content="Gogs">
 
-    <title>Title</title>
+    <link rel="shortcut icon" href="{{AppURL}}/img/favicon.png" />
+
+    <!-- Stylesheet -->
+    <link rel="stylesheet" type="text/css" href="{{AppURL}}/css/semantic-2.4.1.min.css">
+    <link rel="stylesheet" type="text/css" href="{{AppURL}}/css/anony.css?v={{MD5 AppVer}}">
+
+    <!-- JavaScript -->
+    <script src="{{AppURL}}/js/jquery-3.4.1.min.js"></script>
+    <script src="{{AppURL}}/js/semantic-2.4.1.min.js"></script>
+    <script src="{{AppURL}}/js/anony.js?v={{MD5 AppVer}}"></script>
+
+    <title>Anonymoe{{if .User}} - {{.User}}{{end}}</title>
 </head>
 <body>
-
+    <div class="full height">
+        <noscript>This website works better with JavaScript</noscript>
+        <div class="header bar light">
+            <
+{{/*
+    </div>
 </body>
 </html>
+*/}}
