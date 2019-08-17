@@ -9,6 +9,7 @@ import (
 	"anonymoe/pkg/setting"
 	"anonymoe/pkg/template"
 	"anonymoe/routes"
+	"github.com/go-macaron/session"
 	"github.com/urfave/cli"
 	log "gopkg.in/clog.v1"
 	"gopkg.in/macaron.v1"
@@ -38,11 +39,13 @@ func newMacaron() *macaron.Macaron {
 		Funcs:      funcMap,
 		IndentJSON: macaron.Env != macaron.PROD,
 	}))
+	m.Use(session.Sessioner(setting.SessionConfig))
 	m.Use(context.Contexter())
 	return m
 }
 
 func runWeb(c *cli.Context) error {
+	routes.GlobalInit()
 	m := newMacaron()
 	m.SetAutoHead(true)
 	m.Get("/", routes.Home)

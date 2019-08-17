@@ -8,6 +8,7 @@ import (
 
 	"anonymoe/pkg/bindata"
 	"github.com/Unknwon/com"
+	"github.com/go-macaron/session"
 	log "gopkg.in/clog.v1"
 	"gopkg.in/ini.v1"
 )
@@ -31,6 +32,9 @@ var (
 	Cfg        *ini.File
 	CustomPath string
 	CustomConf string
+
+	// Session settings
+	SessionConfig session.Options
 )
 
 // execPath returns the executable path.
