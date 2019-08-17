@@ -21,12 +21,14 @@
 
     <!-- Stylesheet -->
     <link rel="stylesheet" type="text/css" href="{{AppURL}}/css/semantic-2.4.1.min.css">
+    <link rel="stylesheet" type="text/css" href="{{AppURL}}/assets/octicons-4.3.0/octicons.min.css">
     <link rel="stylesheet" type="text/css" href="{{AppURL}}/css/anony.css?v={{MD5 AppVer}}">
 
     <!-- JavaScript -->
     <script src="{{AppURL}}/js/clipboard-2.0.4.min.js"></script>
     <script src="{{AppURL}}/js/jquery-3.4.1.min.js"></script>
     <script src="{{AppURL}}/js/semantic-2.4.1.min.js"></script>
+    <script src="{{AppURL}}/js/jdenticon-2.2.0.min.js"></script>
     <script src="{{AppURL}}/js/anony.js?v={{MD5 AppVer}}"></script>
 
     <title>{{AppName}}{{if .User}} - {{.User}}{{end}}</title>
@@ -40,15 +42,20 @@
                     <div class="column">
                         <div class="ui top secondary menu">
                             <a class="item brand" href="{{AppURL}}/">
-                                <img class="ui mini image" src="{{AppURL}}/img/favicon.png">
+                                <img class="ui mini image" src="{{AppURL}}/img/logo.png">
                             </a>
                             <a class="item" href="{{AppURL}}/">Home</a>
+                            <a class="item" href="{{AppURL}}/inbox">Inbox</a>
 
                             <div class="right menu">
                                 <div class="ui action small input" id="user-email-panel">
+                                    {{if .User}}<svg class="avatar" data-jdenticon-value="{{.User}}"></svg>{{end}}
                                     <input id="user-email" value="{{if .User}}{{.User}}@{{AppDomain}}{{end}}" readonly>
                                     <button class="ui basic icon button poping up clipboard" {{if not .User}}disabled="disabled"{{end}} id="clipboard-btn" data-original="Copy" data-success="Copied!" data-error="Press ⌘-C or Ctrl-C to copy" data-content="Copy" data-variation="inverted tiny" data-clipboard-target="#user-email">
                                         <i class="octicon octicon-clippy"></i>
+                                    </button>
+                                    <button class="ui basic icon button poping up" id="reidentify-btn" data-original="Reidentify" data-content="Reidentify" data-variation="inverted tiny" onclick="window.location.href = '{{AppURL}}/inbox';">
+                                        <i class="octicon octicon-sync"></i>
                                     </button>
                                 </div>
                             </div>

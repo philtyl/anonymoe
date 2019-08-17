@@ -114,12 +114,8 @@ func Contexter() macaron.Handler {
 			Context: ctx,
 			Flash:   f,
 			Session: sess,
-			//User:    sess.Get("user").(string),
 		}
-		c.Data["PageStartTime"] = time.Now()
-
 		log.Trace("Session ID: %s", sess.ID())
-
 		ctx.Map(c)
 	}
 }

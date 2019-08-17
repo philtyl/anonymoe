@@ -58,10 +58,6 @@ img {
 .following.bar .top.menu .menu {
   z-index: 900;
 }
-.following.bar .icon,
-.following.bar .octicon {
-  margin-right: 5px !important;
-}
 .following.bar .head.link.item {
   padding-right: 0 !important;
 }
@@ -236,8 +232,7 @@ footer .container .links > *:first-child {
   padding-left: 0 !important;
 }
 #user-email-panel {
-  margin-top: -8px;
-  margin-left: 5px;
+  margin: 5px 0 5px 5px;
   width: 350px;
   background-color: #f4f4f4 !important;
 }
@@ -248,21 +243,10 @@ footer .container .links > *:first-child {
   border-radius: 0;
   padding: 5px 10px;
 }
-#user-email-panel .clone.button {
-  font-size: 13px;
-  padding: 0 5px;
-}
-#user-email-panel .clone.button:first-child {
-  border-radius: 0.28571429rem 0 0 0.28571429rem;
-}
 #user-email-panel .icon.button {
   padding: 0 10px;
 }
-.ui.dropdown .menu > .item > .image,
-.ui.dropdown .menu > .item > img,
-.ui.dropdown > .text > .image,
-.ui.dropdown > .text > img {
-  vertical-align: middle;
-  margin-top: 0;
-  margin-bottom: 0;
+#user-email-panel .avatar {
+  height: 30px;
+  width: 30px;
 }

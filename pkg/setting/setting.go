@@ -103,12 +103,9 @@ func NewContext() {
 	AppName = Cfg.Section("").Key("APP_NAME").MustString("Anonymoe")
 
 	sec := Cfg.Section("server")
-	AppURL = sec.Key("ROOT_URL").MustString("http://localhost:3000/")
+	AppURL = sec.Key("ROOT_URL").MustString("http://localhost:3000")
 	Protocol = sec.Key("PROTOCOL").String()
 	AppDomain = sec.Key("DOMAIN").MustString("localhost")
 	HTTPAddr = sec.Key("HTTP_ADDR").MustString("0.0.0.0")
 	HTTPPort = sec.Key("HTTP_PORT").MustString("3000")
-	if AppURL[len(AppURL)-1] != '/' {
-		AppURL += "/"
-	}
 }

@@ -55,10 +55,6 @@ img {
   .top.menu .menu {
     z-index: 900;
   }
-  .icon,
-  .octicon {
-    margin-right: 5px !important;
-  }
   .head.link.item {
     padding-right: 0 !important;
   }
@@ -265,8 +261,7 @@ footer {
 }
 
 #user-email-panel {
-  margin-top: -8px;
-  margin-left: 5px;
+  margin: 5px 0 5px 5px;
   width: 350px;
   background-color: rgb(244, 244, 244) !important;
   &:focus {
@@ -278,24 +273,12 @@ footer {
     padding: 5px 10px;
   }
 
-  .clone.button {
-    font-size: 13px;
-    padding: 0 5px;
-    &:first-child {
-      border-radius: .28571429rem 0 0 .28571429rem;
-    }
-  }
   .icon.button {
     padding: 0 10px;
   }
-}
 
-// Reset CSS to prevent UI breaks
-.ui.dropdown .menu>.item>.image,
-.ui.dropdown .menu>.item>img,
-.ui.dropdown>.text>.image,
-.ui.dropdown>.text>img {
-  vertical-align: middle;
-  margin-top: 0;
-  margin-bottom: 0;
+  .avatar {
+    height: 30px;
+    width: 30px;
+  }
 }

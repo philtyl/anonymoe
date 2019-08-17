@@ -49,7 +49,8 @@ func runWeb(c *cli.Context) error {
 	m := newMacaron()
 	m.SetAutoHead(true)
 	m.Get("/", routes.Home)
-	m.Get("/inbox/:username", routes.Inbox)
+	m.Get("/inbox", routes.NewInbox)
+	m.Get("/inbox/:user", routes.Inbox)
 	m.NotFound(routes.Home)
 
 	//// Flag for port number in case first time run conflict.
