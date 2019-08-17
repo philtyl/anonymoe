@@ -1,9 +1,16 @@
 package cmd
 
 import (
+	"fmt"
+	"net/http"
 	"path"
 
+	"anonymoe/pkg/context"
+	"anonymoe/pkg/setting"
+	"anonymoe/pkg/template"
+	"anonymoe/routes"
 	"github.com/urfave/cli"
+	log "gopkg.in/clog.v1"
 	"gopkg.in/macaron.v1"
 )
 
@@ -31,8 +38,33 @@ func newMacaron() *macaron.Macaron {
 		Funcs:      funcMap,
 		IndentJSON: macaron.Env != macaron.PROD,
 	}))
+	m.Use(context.Contexter())
+	return m
 }
 
 func runWeb(c *cli.Context) error {
+	m := newMacaron()
+	m.SetAutoHead(true)
+	m.Get("/", routes.Home)
+	m.Get("/inbox/:username", routes.Inbox)
+	m.NotFound(routes.Home)
+
+	//// Flag for port number in case first time run conflict.
+	//if c.IsSet("port") {
+	//	setting.AppURL = strings.Replace(setting.AppURL, setting.HTTPPort, c.String("port"), 1)
+	//	setting.HTTPPort = c.String("port")
+	//}
+
+	listenAddr := fmt.Sprintf("%s:%s", setting.HTTPAddr, setting.HTTPPort)
+	log.Info("Listen: %v://%s%s", setting.Protocol, listenAddr, setting.AppURL)
+
+	var err error
+	server := &http.Server{Addr: listenAddr, Handler: m}
+	err = server.ListenAndServe()
+
+	if err != nil {
+		log.Fatal(4, "Failed to start server: %v", err)
+	}
+
 	return nil
 }

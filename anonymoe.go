@@ -5,8 +5,8 @@ import (
 
 	"github.com/urfave/cli"
 
-	"github.com/philtyl/anonymoe/cmd"
-	"github.com/philtyl/anonymoe/pkg/setting"
+	"anonymoe/cmd"
+	"anonymoe/pkg/setting"
 )
 
 const APP_VER = "0.0.1"
