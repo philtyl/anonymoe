@@ -45,19 +45,26 @@
                                 <img class="ui mini image" src="{{AppURL}}/img/logo.png">
                             </a>
                             <a class="item" href="{{AppURL}}/">Home</a>
-                            <a class="item" href="{{AppURL}}/inbox">Inbox</a>
 
                             <div class="right menu">
-                                <div class="ui action small input" id="user-email-panel">
-                                    {{if .User}}<svg class="avatar" data-jdenticon-value="{{.User}}"></svg>{{end}}
-                                    <input id="user-email" value="{{if .User}}{{.User}}@{{AppDomain}}{{end}}" readonly>
-                                    <button class="ui basic icon button poping up clipboard" {{if not .User}}disabled="disabled"{{end}} id="clipboard-btn" data-original="Copy" data-success="Copied!" data-error="Press ⌘-C or Ctrl-C to copy" data-content="Copy" data-variation="inverted tiny" data-clipboard-target="#user-email">
-                                        <i class="octicon octicon-clippy"></i>
-                                    </button>
-                                    <button class="ui basic icon button poping up" id="reidentify-btn" data-original="Reidentify" data-content="Reidentify" data-variation="inverted tiny" onclick="window.location.href = '{{AppURL}}/inbox';">
-                                        <i class="octicon octicon-sync"></i>
-                                    </button>
-                                </div>
+                                {{if .User}}
+                                    <div class="ui action small input" id="user-email-panel">
+                                        <svg class="ui basic icon avatar" data-jdenticon-value="{{.User}}"></svg>
+                                        <input id="user-email" value="{{.User}}@{{AppDomain}}" readonly>
+                                        <button class="ui basic icon button poping up clipboard" id="clipboard-btn" data-original="Copy" data-success="Copied!" data-error="Press ⌘-C or Ctrl-C to copy" data-content="Copy" data-variation="inverted tiny" data-clipboard-target="#user-email">
+                                            <i class="octicon octicon-clippy"></i>
+                                        </button>
+                                        <button class="ui basic icon button poping up" id="reidentify-btn" data-content="New Account" data-variation="inverted tiny" onclick="window.location.href = '{{AppURL}}/inbox';">
+                                            <i class="octicon octicon-sync"></i>
+                                        </button>
+                                    </div>
+                                {{else}}
+                                    <div class="ui action small input" id="claim-email-panel">
+                                        <button class="ui basic button" id="identify-btn" onclick="window.location.href = '{{AppURL}}/inbox';">
+                                            Create New Account
+                                        </button>
+                                    </div>
+                                {{end}}
                             </div>
                         </div>
                     </div>

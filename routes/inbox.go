@@ -17,6 +17,6 @@ func NewInbox(c *context.Context) {
 }
 
 func Inbox(c *context.Context) {
-	c.Data["User"] = c.Params(":user")
+	c.Data["User"] = strings.ToLower(c.Params(":user"))
 	c.Success(INBOX)
 }
