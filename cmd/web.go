@@ -6,6 +6,7 @@ import (
 	"path"
 
 	"anonymoe/pkg/context"
+	"anonymoe/pkg/mail"
 	"anonymoe/pkg/setting"
 	"anonymoe/pkg/template"
 	"anonymoe/routes"
@@ -19,14 +20,14 @@ var Web = cli.Command{
 	Name:        "web",
 	Usage:       "Start web server",
 	Description: `Anonymoe web server starts all necessary components`,
-	Action:      runWeb,
+	Action:      StartServer,
 	Flags: []cli.Flag{
 		stringFlag("port, p", "3000", "Temporary port number to prevent conflict"),
 		stringFlag("config, c", "custom/conf/app.ini", "Custom configuration file path"),
 	},
 }
 
-func newMacaron() *macaron.Macaron {
+func NewMacaron() *macaron.Macaron {
 	m := macaron.New()
 	m.Use(macaron.Logger())
 	m.Use(macaron.Static(
@@ -44,20 +45,20 @@ func newMacaron() *macaron.Macaron {
 	return m
 }
 
-func runWeb(c *cli.Context) error {
+func StartServer(c *cli.Context) error {
+	go mail.NewSMTPServer()
+	return RunWeb(c)
+}
+
+func RunWeb(c *cli.Context) error {
 	routes.GlobalInit()
-	m := newMacaron()
+
+	m := NewMacaron()
 	m.SetAutoHead(true)
 	m.Get("/", routes.Home)
 	m.Get("/inbox", routes.NewInbox)
 	m.Get("/inbox/:user", routes.Inbox)
 	m.NotFound(routes.Home)
-
-	//// Flag for port number in case first time run conflict.
-	//if c.IsSet("port") {
-	//	setting.AppURL = strings.Replace(setting.AppURL, setting.HTTPPort, c.String("port"), 1)
-	//	setting.HTTPPort = c.String("port")
-	//}
 
 	listenAddr := fmt.Sprintf("%s:%s", setting.HTTPAddr, setting.HTTPPort)
 	log.Info("Listen: %v://%s%s", setting.Protocol, listenAddr, setting.AppURL)

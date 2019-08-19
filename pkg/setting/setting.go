@@ -35,6 +35,9 @@ var (
 
 	// Session settings
 	SessionConfig session.Options
+
+	// Mail settings
+	PrivateAccounts []string
 )
 
 // execPath returns the executable path.
@@ -102,10 +105,22 @@ func NewContext() {
 
 	AppName = Cfg.Section("").Key("APP_NAME").MustString("Anonymoe")
 
-	sec := Cfg.Section("server")
-	AppURL = sec.Key("ROOT_URL").MustString("http://localhost:3000")
-	Protocol = sec.Key("PROTOCOL").String()
-	AppDomain = sec.Key("DOMAIN").MustString("localhost")
-	HTTPAddr = sec.Key("HTTP_ADDR").MustString("0.0.0.0")
-	HTTPPort = sec.Key("HTTP_PORT").MustString("3000")
+	serverSec := Cfg.Section("server")
+	AppURL = serverSec.Key("ROOT_URL").MustString("http://localhost:3000")
+	Protocol = serverSec.Key("PROTOCOL").String()
+	AppDomain = serverSec.Key("DOMAIN").MustString("localhost")
+	HTTPAddr = serverSec.Key("HTTP_ADDR").MustString("0.0.0.0")
+	HTTPPort = serverSec.Key("HTTP_PORT").MustString("3000")
+
+	mailSec := Cfg.Section("mail")
+	PrivateAccounts = strings.Split(mailSec.Key("PRIVATE_ACCOUNTS").MustString("hostmaster"), ",")
+}
+
+func IsPrivateAccount(account string) bool {
+	for _, a := range PrivateAccounts {
+		if account == a {
+			return true
+		}
+	}
+	return false
 }

@@ -22,7 +22,6 @@ func main() {
 	app.Version = APP_VER
 	app.Commands = []cli.Command{
 		cmd.Web,
-		cmd.Mail,
 	}
 	app.Run(os.Args)
 }
