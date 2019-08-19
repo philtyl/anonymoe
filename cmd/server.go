@@ -2,9 +2,11 @@ package cmd
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 	"path"
 
+	"anonymoe/models"
 	"anonymoe/pkg/context"
 	"anonymoe/pkg/mail"
 	"anonymoe/pkg/setting"
@@ -12,14 +14,13 @@ import (
 	"anonymoe/routes"
 	"github.com/go-macaron/session"
 	"github.com/urfave/cli"
-	log "gopkg.in/clog.v1"
 	"gopkg.in/macaron.v1"
 )
 
-var Web = cli.Command{
-	Name:        "web",
-	Usage:       "Start web server",
-	Description: `Anonymoe web server starts all necessary components`,
+var Server = cli.Command{
+	Name:        "server",
+	Usage:       "[start] [-p|-port 3000] [-c|-config custom/conf/app.ini]",
+	Description: "Anonymoe web server starts all necessary components",
 	Action:      StartServer,
 	Flags: []cli.Flag{
 		stringFlag("port, p", "3000", "Temporary port number to prevent conflict"),
@@ -53,6 +54,11 @@ func StartServer(c *cli.Context) error {
 func RunWeb(c *cli.Context) error {
 	routes.GlobalInit()
 
+	models.LoadConfigs()
+	if err := models.SetEngine(); err != nil {
+		log.Fatalf("Internal error: SetEngine: %v", err)
+	}
+
 	m := NewMacaron()
 	m.SetAutoHead(true)
 	m.Get("/", routes.Home)
@@ -61,14 +67,14 @@ func RunWeb(c *cli.Context) error {
 	m.NotFound(routes.Home)
 
 	listenAddr := fmt.Sprintf("%s:%s", setting.HTTPAddr, setting.HTTPPort)
-	log.Info("Listen: %v://%s%s", setting.Protocol, listenAddr, setting.AppURL)
+	log.Printf("Listen: %v://%s%s", setting.Protocol, listenAddr, setting.AppURL)
 
 	var err error
 	server := &http.Server{Addr: listenAddr, Handler: m}
 	err = server.ListenAndServe()
 
 	if err != nil {
-		log.Fatal(4, "Failed to start server: %v", err)
+		log.Fatalf("Failed to start server: %v", err)
 	}
 
 	return nil

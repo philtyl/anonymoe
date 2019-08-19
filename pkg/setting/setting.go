@@ -1,6 +1,7 @@
 package setting
 
 import (
+	"log"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -9,7 +10,6 @@ import (
 	"anonymoe/pkg/bindata"
 	"github.com/Unknwon/com"
 	"github.com/go-macaron/session"
-	log "gopkg.in/clog.v1"
 	"gopkg.in/ini.v1"
 )
 
@@ -93,7 +93,7 @@ func NewContext() {
 			log.Fatal(2, "Fail to load custom conf '%s': %v", CustomConf, err)
 		}
 	} else {
-		log.Warn("Custom config '%s' not found, ignore this if you're running first time", CustomConf)
+		log.Printf("Custom config '%s' not found, ignore this if you're running first time", CustomConf)
 	}
 	Cfg.NameMapper = ini.AllCapsUnderscore
 

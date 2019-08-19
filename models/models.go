@@ -7,6 +7,7 @@ import (
 
 	"anonymoe/pkg/setting"
 	"github.com/go-xorm/xorm"
+	_ "github.com/mattn/go-sqlite3"
 	"xorm.io/core"
 )
 
@@ -32,7 +33,7 @@ func init() {
 func LoadConfigs() {
 	sec := setting.Cfg.Section("database")
 	DbCfg.Type = "sqlite3"
-	DbCfg.Path = sec.Key("PATH").MustString("data/gogs.db")
+	DbCfg.Path = sec.Key("PATH").MustString("data/anonymail.db")
 }
 
 func getEngine() (*xorm.Engine, error) {

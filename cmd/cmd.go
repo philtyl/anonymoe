@@ -11,3 +11,10 @@ func stringFlag(name, value, usage string) cli.StringFlag {
 		Usage: usage,
 	}
 }
+
+func boolFlag(name, usage string) cli.BoolFlag {
+	return cli.BoolFlag{
+		Name:  name,
+		Usage: usage,
+	}
+}

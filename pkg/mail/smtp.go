@@ -3,10 +3,10 @@ package mail
 import (
 	"io"
 	"io/ioutil"
+	"log"
 	"time"
 
 	"anonymoe/pkg/setting"
-	log "gopkg.in/clog.v1"
 
 	"anonymoe/models"
 	"github.com/emersion/go-smtp"
@@ -55,7 +55,7 @@ func (s *Session) Reset() {
 
 func (s *Session) Logout() error {
 	mail, recipients, err := models.CreateMail(s.Item)
-	log.Info("Mail Received: %v\nSent to: %v", mail, recipients)
+	log.Printf("Mail Received: %v\nSent to: %v", mail, recipients)
 	return err
 }
 

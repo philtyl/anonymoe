@@ -21,7 +21,8 @@ func main() {
 	app.Usage = "An open source anonymous password-less email client"
 	app.Version = APP_VER
 	app.Commands = []cli.Command{
-		cmd.Web,
+		cmd.Server,
+		cmd.Install,
 	}
 	app.Run(os.Args)
 }
