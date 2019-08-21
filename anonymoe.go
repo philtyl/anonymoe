@@ -3,13 +3,13 @@ package main
 import (
 	"os"
 
-	"github.com/urfave/cli"
-
 	"anonymoe/cmd"
+	"anonymoe/pkg/bindata"
 	"anonymoe/pkg/setting"
+	"github.com/urfave/cli"
 )
 
-const APP_VER = "0.0.3"
+var APP_VER = string(bindata.MustAsset("conf/VERSION"))
 
 func init() {
 	setting.AppVer = APP_VER

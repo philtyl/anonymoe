@@ -71,7 +71,7 @@ func WorkDir() string {
 func InstallDir() (dir string) {
 	dir = os.Getenv("ANONY_CONFIG")
 	if len(dir) == 0 {
-		dir = path.Join(WorkDir(), "install")
+		dir = path.Join(WorkDir(), "anonymoe-data")
 	}
 	return dir
 }
