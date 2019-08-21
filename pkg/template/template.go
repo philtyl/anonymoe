@@ -39,6 +39,9 @@ func NewFuncMap() []template.FuncMap {
 			m.Write([]byte(str))
 			return hex.EncodeToString(m.Sum(nil))
 		},
+		"Str2HTML": func(raw string) template.HTML {
+			return template.HTML(raw) //TODO Sanatize
+		},
 	}}
 }
 

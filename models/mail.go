@@ -1,10 +1,14 @@
 package models
 
 import (
-	"regexp"
+	"io/ioutil"
+	"net/mail"
+	"strings"
 	"time"
 
+	"anonymoe/pkg/setting"
 	"github.com/go-xorm/xorm"
+	"github.com/lunny/log"
 )
 
 type MailRecipient struct {
@@ -29,9 +33,8 @@ type RawMailItem struct {
 	From      string
 	Recipient []string
 	Data      string
+	Complete  bool
 }
-
-const DataPattern = "Date: (.*)\nFrom: .*\nSubject: (.*)\nTo: (.*)\n\n(.*)."
 
 func (m *Mail) BeforeInsert() {
 	m.ReceivedUnix = time.Now().Unix()
@@ -47,14 +50,24 @@ func (m *Mail) AfterSet(colName string, _ xorm.Cell) {
 }
 
 func createMail(e *xorm.Session, raw *RawMailItem) (_ *Mail, _ []MailRecipient, err error) {
-	re := regexp.MustCompile(DataPattern)
-	match := re.FindStringSubmatch(raw.Data)
-	received, _ := time.Parse("Thu, 21 May 2008 05:33:29 -0700", match[0])
+	r := strings.NewReader(raw.Data)
+	m, err := mail.ReadMessage(r)
+	if err != nil {
+		return
+	}
+
+	header := m.Header
+	body, err := ioutil.ReadAll(m.Body)
+	if err != nil {
+		return
+	}
+
+	received, _ := time.Parse("Thu, 21 May 2008 05:33:29 -0700", header.Get("Date"))
 	mailItem := &Mail{
 		From:     raw.From,
 		Received: received,
-		Subject:  match[1],
-		Body:     match[2],
+		Subject:  header.Get("Subject"),
+		Body:     string(body),
 	}
 	if _, err = e.Insert(mailItem); err != nil {
 		return nil, nil, err
@@ -62,19 +75,23 @@ func createMail(e *xorm.Session, raw *RawMailItem) (_ *Mail, _ []MailRecipient, 
 
 	var recipients []MailRecipient
 	for _, recipient := range raw.Recipient {
-		user, err := GetOrCreateUserByName(recipient)
-		if err != nil {
-			return nil, nil, err
-		}
-		if user != nil {
-			mailRecipient := &MailRecipient{
-				MailId:      mailItem.Id,
-				RecipientId: user.Id,
-			}
-			if _, err = e.Insert(mailRecipient); err != nil {
+		if strings.HasSuffix(recipient, "@"+setting.AppDomain) {
+			user, err := GetOrCreateUserByName(e, recipient)
+			if err != nil {
 				return nil, nil, err
 			}
-			recipients = append(recipients, *mailRecipient)
+			if user != nil {
+				mailRecipient := &MailRecipient{
+					MailId:      mailItem.Id,
+					RecipientId: user.Id,
+				}
+				if _, err = e.Insert(mailRecipient); err != nil {
+					return nil, nil, err
+				}
+				recipients = append(recipients, *mailRecipient)
+			}
+		} else {
+			log.Infof("Receiving mail for outside address: %s, skipping linkage...", recipient)
 		}
 	}
 
@@ -94,4 +111,8 @@ func CreateMail(raw *RawMailItem) (mail *Mail, recipients []MailRecipient, err e
 	}
 
 	return mail, recipients, sess.Commit()
+}
+
+func getUserMailCount(u *User) (int64, error) {
+	return x.Count(&MailRecipient{RecipientId: u.Id})
 }

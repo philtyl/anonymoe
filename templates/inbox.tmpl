@@ -1,3 +1,20 @@
 {{template "base/header" .}}
-INBOX
+<div class="ui list">
+    {{range .Mail}}
+        <div class="item">
+            <div class="ui grid">
+                <div class="ui two wide column middle aligned center">
+                    <svg class="ui basic icon avatar" data-jdenticon-value="{{.From}}"></svg>
+                </div>
+                <div class="ui fourteen wide column no-padding-left">
+                    <div class="ui header">
+                        <span class="name">{{.Subject}}</span>
+                    </div>
+                    <p class="has-emoji">{{.Body | Str2HTML}}</p>
+                    <p class="time">{{.Received}}</p>
+                </div>
+            </div>
+        </div>
+    {{end}}
+</div>
 {{template "base/footer" .}}

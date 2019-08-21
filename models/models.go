@@ -15,6 +15,7 @@ import (
 type Engine interface {
 	Get(interface{}) (bool, error)
 	Insert(...interface{}) (int64, error)
+	Count(interface{}) (int64, error)
 }
 
 var (
@@ -27,16 +28,16 @@ var (
 )
 
 func init() {
-	tables = append(tables, new(User), new(Mail))
+	tables = append(tables, new(User), new(Mail), new(MailRecipient))
 }
 
 func LoadConfigs() {
-	sec := setting.Cfg.Section("database")
-	DbCfg.Type = "sqlite3"
-	DbCfg.Path = sec.Key("PATH").MustString("data/anonymail.db")
+	DbCfg.Type = setting.DatabaseType
+	DbCfg.Path = setting.DatabasePath
 }
 
 func getEngine() (*xorm.Engine, error) {
+	LoadConfigs()
 	if err := os.MkdirAll(path.Dir(DbCfg.Path), os.ModePerm); err != nil {
 		return nil, fmt.Errorf("create directories: %v", err)
 	}
@@ -44,6 +45,7 @@ func getEngine() (*xorm.Engine, error) {
 }
 
 func SetEngine() (err error) {
+	LoadConfigs()
 	x, err = getEngine()
 	if err != nil {
 		return fmt.Errorf("connect to database: %v", err)

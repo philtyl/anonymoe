@@ -3,7 +3,9 @@ package models
 import (
 	"time"
 
+	"anonymoe/pkg/setting"
 	"github.com/go-xorm/xorm"
+	"github.com/lunny/log"
 )
 
 type User struct {
@@ -18,41 +20,74 @@ func (u *User) BeforeInsert() {
 	u.CreatedUnix = time.Now().Unix()
 }
 
-func getUserByName(name string) (user *User, err error) {
+func (u *User) AfterSet(colName string, _ xorm.Cell) {
+	switch colName {
+	case "created_unix":
+		u.Created = time.Unix(u.CreatedUnix, 0).Local()
+	}
+}
+
+func (u *User) getUserMail() (mailItems []*Mail, err error) {
+	log.Infof("loading mail items for '%s'", u.Name)
+	count, err := getUserMailCount(u)
+	log.Infof("%d mail items found for '%s'", count, u.Name)
+	if err != nil {
+		return
+	}
+	sess := x.Where("recipient_id=?", u.Id)
+	recipients := make([]*MailRecipient, 0, count)
+	if err = sess.Find(&recipients); err != nil {
+		return
+	}
+
+	mailItems = make([]*Mail, 0, count)
+	for _, recipient := range recipients {
+		mailItem := &Mail{Id: recipient.MailId}
+		if has, err := x.Get(mailItem); has {
+			mailItems = append(mailItems, mailItem)
+		} else if err != nil {
+			return mailItems, err
+		}
+	}
+	return
+}
+
+func getUserByName(name string) (user *User, has bool, err error) {
 	user = &User{
 		Name: name,
 	}
-	has, err := x.Get(user)
-	if has && err != nil {
-		return user, err
-	} else {
-		return nil, err
-	}
+	has, err = x.Get(user)
+	log.Infof("user: %+v, has: %b, err: %+v", user, has, err)
+	return user, has, err
 }
 
-func createUser(e *xorm.Session, name string) (_ *User, err error) {
-	userItem := &User{
-		Name: name,
-	}
-	_, err = e.Insert(userItem)
+func createUser(e *xorm.Session, userItem *User) (*User, error) {
+	_, err := e.Insert(userItem)
 	return userItem, err
 }
 
-func GetOrCreateUserByName(name string) (user *User, err error) {
-	user, err = getUserByName(name)
+func GetOrCreateUserByName(e *xorm.Session, name string) (user *User, err error) {
+	var has bool
+	user, has, err = getUserByName(name)
 	if err != nil {
 		return nil, err
 	}
 
-	sess := x.NewSession()
-	defer sess.Close()
-	if err = sess.Begin(); err != nil {
-		return nil, err
+	if !has {
+		user, err = createUser(e, user)
+		if err != nil {
+			return nil, err
+		}
+		log.Infof("Created User: %+v", user)
 	}
 
-	if user == nil {
-		user, err = createUser(sess, name)
-	}
+	return user, nil
+}
 
-	return user, sess.Commit()
+func GetMail(username string) ([]*Mail, error) {
+	user, has, err := getUserByName(username + "@" + setting.AppDomain)
+	if err == nil && user != nil && has {
+		return user.getUserMail()
+	}
+	return nil, err
 }

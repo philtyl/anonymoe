@@ -22,7 +22,7 @@ func (bkd *Backend) Login(state *smtp.ConnectionState, username, password string
 
 // AnonymousLogin requires clients to authenticate using SMTP AUTH before sending emails
 func (bkd *Backend) AnonymousLogin(state *smtp.ConnectionState) (smtp.Session, error) {
-	return nil, smtp.ErrAuthUnsupported
+	return &Session{Item: &models.RawMailItem{}}, nil
 }
 
 // A Session is returned after successful login.
@@ -45,18 +45,25 @@ func (s *Session) Data(r io.Reader) error {
 		return err
 	} else {
 		s.Item.Data = string(b)
+		s.Item.Complete = true
 	}
 	return nil
 }
 
 func (s *Session) Reset() {
+	if s.Item.Complete {
+		mail, recipients, err := models.CreateMail(s.Item)
+		if err == nil {
+			log.Printf("Mail Received: %+v\nSent to: %+v", mail, recipients)
+		} else {
+			log.Printf("Error Finalizing Mail Item: %v", err)
+		}
+	}
 	s.Item = new(models.RawMailItem)
 }
 
 func (s *Session) Logout() error {
-	mail, recipients, err := models.CreateMail(s.Item)
-	log.Printf("Mail Received: %v\nSent to: %v", mail, recipients)
-	return err
+	return nil
 }
 
 func NewSMTPServer() {
@@ -74,6 +81,6 @@ func NewSMTPServer() {
 	s.AuthDisabled = true
 
 	if err := s.ListenAndServe(); err != nil {
-		log.Fatal(2, "Failed to start mail server: %v", err)
+		log.Fatal(2, "Failed to start mail server: %+v", err)
 	}
 }

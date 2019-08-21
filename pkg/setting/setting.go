@@ -4,10 +4,10 @@ import (
 	"log"
 	"os"
 	"os/exec"
+	"path"
 	"path/filepath"
 	"strings"
 
-	"anonymoe/pkg/bindata"
 	"github.com/Unknwon/com"
 	"github.com/go-macaron/session"
 	"gopkg.in/ini.v1"
@@ -28,10 +28,13 @@ var (
 	HTTPPort       string
 	Protocol       string
 
+	// Database settings
+	DatabaseType string
+	DatabasePath string
+
 	// Global setting objects
-	Cfg        *ini.File
-	CustomPath string
-	CustomConf string
+	Cfg         *ini.File
+	CfgFilePath string
 
 	// Session settings
 	SessionConfig session.Options
@@ -52,56 +55,45 @@ func execPath() (string, error) {
 func init() {
 	var err error
 	if AppPath, err = execPath(); err != nil {
-		log.Fatal(2, "Fail to get app path: %v\n", err)
+		log.Fatalf("Fail to get app path: %v\n", err)
 	}
 	AppPath = strings.Replace(AppPath, "\\", "/", -1)
 }
 
-// WorkDir returns absolute path of work directory.
-func WorkDir() (string, error) {
+func WorkDir() string {
 	i := strings.LastIndex(AppPath, "/")
 	if i == -1 {
-		return AppPath, nil
+		return AppPath
 	}
-	return AppPath[:i], nil
+	return AppPath[:i]
 }
 
-func NewContext() {
-	workDir, err := WorkDir()
-	if err != nil {
-		log.Fatal(2, "Fail to get work directory: %v", err)
+func InstallDir() (dir string) {
+	dir = os.Getenv("ANONY_CONFIG")
+	if len(dir) == 0 {
+		dir = path.Join(WorkDir(), "install")
 	}
+	return dir
+}
 
+func NewContext() (err error) {
+	InstallPath := InstallDir()
+	CfgFilePath = path.Join(InstallPath, "app.ini")
 	Cfg, err = ini.LoadSources(ini.LoadOptions{
 		IgnoreInlineComment: true,
-	}, bindata.MustAsset("conf/app.ini"))
+	}, CfgFilePath)
 	if err != nil {
-		log.Fatal(2, "Fail to parse 'conf/app.ini': %v", err)
+		log.Fatalf("Fail to parse 'app.ini': %v", err)
 	}
 
-	CustomPath = os.Getenv("ANONY_CUSTOM")
-	if len(CustomPath) == 0 {
-		CustomPath = workDir + "/custom"
-	}
-
-	if len(CustomConf) == 0 {
-		CustomConf = CustomPath + "/conf/app.ini"
-	}
-
-	if com.IsFile(CustomConf) {
-		if err = Cfg.Append(CustomConf); err != nil {
-			log.Fatal(2, "Fail to load custom conf '%s': %v", CustomConf, err)
+	if com.IsFile(CfgFilePath) {
+		if err = Cfg.Append(CfgFilePath); err != nil {
+			log.Fatalf("Fail to load custom config '%s': %v", CfgFilePath, err)
 		}
 	} else {
-		log.Printf("Custom config '%s' not found, ignore this if you're running first time", CustomConf)
+		log.Fatalf("Install config '%s' not found, please install server", CfgFilePath)
 	}
 	Cfg.NameMapper = ini.AllCapsUnderscore
-
-	homeDir, err := com.HomeDir()
-	if err != nil {
-		log.Fatal(2, "Fail to get home directory: %v", err)
-	}
-	homeDir = strings.Replace(homeDir, "\\", "/", -1)
 
 	AppName = Cfg.Section("").Key("APP_NAME").MustString("Anonymoe")
 
@@ -112,8 +104,14 @@ func NewContext() {
 	HTTPAddr = serverSec.Key("HTTP_ADDR").MustString("0.0.0.0")
 	HTTPPort = serverSec.Key("HTTP_PORT").MustString("3000")
 
+	dbSec := Cfg.Section("database")
+	DatabaseType = dbSec.Key("TYPE").MustString("sqlite3")
+	DatabasePath = path.Join(InstallPath, dbSec.Key("PATH").MustString("anonymail.db"))
+
 	mailSec := Cfg.Section("mail")
 	PrivateAccounts = strings.Split(mailSec.Key("PRIVATE_ACCOUNTS").MustString("hostmaster"), ",")
+
+	return err
 }
 
 func IsPrivateAccount(account string) bool {
