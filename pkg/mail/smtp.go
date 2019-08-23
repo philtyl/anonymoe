@@ -6,10 +6,10 @@ import (
 	"log"
 	"time"
 
-	"anonymoe/pkg/setting"
+	"github.com/philtyl/anonymoe/pkg/setting"
 
-	"anonymoe/models"
 	"github.com/emersion/go-smtp"
+	"github.com/philtyl/anonymoe/models"
 )
 
 // The Backend implements SMTP server methods.

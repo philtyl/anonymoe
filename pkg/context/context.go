@@ -7,8 +7,8 @@ import (
 	"net/http"
 	"time"
 
-	"anonymoe/pkg/template"
 	"github.com/go-macaron/session"
+	"github.com/philtyl/anonymoe/pkg/template"
 	"gopkg.in/macaron.v1"
 )
 

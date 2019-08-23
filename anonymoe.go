@@ -3,8 +3,8 @@ package main
 import (
 	"os"
 
-	"anonymoe/cmd"
-	"anonymoe/pkg/setting"
+	"github.com/philtyl/anonymoe/cmd"
+	"github.com/philtyl/anonymoe/pkg/setting"
 	"github.com/urfave/cli"
 )
 

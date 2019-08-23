@@ -5,9 +5,9 @@ import (
 	"os"
 	"path"
 
-	"anonymoe/pkg/setting"
 	"github.com/go-xorm/xorm"
 	_ "github.com/mattn/go-sqlite3"
+	"github.com/philtyl/anonymoe/pkg/setting"
 	"xorm.io/core"
 )
 

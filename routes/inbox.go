@@ -4,10 +4,10 @@ import (
 	"log"
 	"strings"
 
-	"anonymoe/models"
-	"anonymoe/pkg/context"
-	"anonymoe/pkg/setting"
 	"github.com/Pallinder/go-randomdata"
+	"github.com/philtyl/anonymoe/models"
+	"github.com/philtyl/anonymoe/pkg/context"
+	"github.com/philtyl/anonymoe/pkg/setting"
 )
 
 const (

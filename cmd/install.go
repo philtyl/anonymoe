@@ -5,9 +5,9 @@ import (
 	"os"
 	"path"
 
-	"anonymoe/models"
-	"anonymoe/pkg/bindata"
-	"anonymoe/pkg/setting"
+	"github.com/philtyl/anonymoe/models"
+	"github.com/philtyl/anonymoe/pkg/bindata"
+	"github.com/philtyl/anonymoe/pkg/setting"
 	"github.com/urfave/cli"
 )
 

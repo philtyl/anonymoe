@@ -8,8 +8,8 @@ import (
 	"strings"
 	"time"
 
-	"anonymoe/pkg/setting"
-	"anonymoe/pkg/tool"
+	"github.com/philtyl/anonymoe/pkg/setting"
+	"github.com/philtyl/anonymoe/pkg/tool"
 )
 
 func NewFuncMap() []template.FuncMap {

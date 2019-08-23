@@ -6,9 +6,9 @@ import (
 	"strings"
 	"time"
 
-	"anonymoe/pkg/setting"
 	"github.com/go-xorm/xorm"
 	"github.com/lunny/log"
+	"github.com/philtyl/anonymoe/pkg/setting"
 )
 
 type MailRecipient struct {

@@ -1,7 +1,7 @@
 package routes
 
 import (
-	"anonymoe/pkg/context"
+	"github.com/philtyl/anonymoe/pkg/context"
 )
 
 const (
