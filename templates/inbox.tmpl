@@ -1,5 +1,9 @@
 {{template "base/header" .}}
-<div id="inboxfeed">
-    {{template "model/mailinbox" .}}
-</div>
+    {{if .Private}}
+        {{template "model/private" .}}
+    {{else}}
+        <div id="inboxfeed">
+            {{template "model/mailinbox" .}}
+        </div>
+    {{end}}
 {{template "base/footer" .}}

@@ -304,3 +304,7 @@ footer .container .links > *:first-child {
   height: 40px;
   width: 40px;
 }
+.private {
+  padding-bottom: 45px !important;
+  margin-top: 20px !important;
+}
