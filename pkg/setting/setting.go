@@ -8,6 +8,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"anonymoe/pkg/bindata"
 	"github.com/Unknwon/com"
 	"github.com/go-macaron/session"
 	"gopkg.in/ini.v1"
@@ -53,6 +54,7 @@ func execPath() (string, error) {
 }
 
 func init() {
+	AppVer = string(bindata.MustAsset("conf/VERSION"))
 	var err error
 	if AppPath, err = execPath(); err != nil {
 		log.Fatalf("Fail to get app path: %v\n", err)

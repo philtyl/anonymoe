@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"anonymoe/pkg/setting"
+	"anonymoe/pkg/tool"
 )
 
 func NewFuncMap() []template.FuncMap {
@@ -41,6 +42,9 @@ func NewFuncMap() []template.FuncMap {
 		},
 		"Str2HTML": func(raw string) template.HTML {
 			return template.HTML(raw) //TODO Sanatize
+		},
+		"HumanTimeSince": func(then time.Time) string {
+			return tool.HumanTimeSince(then)
 		},
 	}}
 }

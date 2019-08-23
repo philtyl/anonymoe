@@ -293,3 +293,14 @@ footer .container .links > *:first-child {
 .home .stackable {
   padding-top: 30px;
 }
+.inbox {
+  padding-bottom: 45px !important;
+  margin-top: 0px !important;
+}
+.inbox .stackable {
+  padding-top: 30px;
+}
+.inbox .avatar {
+  height: 40px;
+  width: 40px;
+}

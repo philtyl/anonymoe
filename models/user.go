@@ -1,6 +1,7 @@
 package models
 
 import (
+	"sort"
 	"time"
 
 	"anonymoe/pkg/setting"
@@ -49,6 +50,9 @@ func (u *User) getUserMail() (mailItems []*Mail, err error) {
 			return mailItems, err
 		}
 	}
+	sort.Slice(mailItems, func(i, j int) bool {
+		return mailItems[i].ReceivedUnix < mailItems[j].ReceivedUnix
+	})
 	return
 }
 

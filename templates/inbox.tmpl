@@ -1,18 +1,19 @@
 {{template "base/header" .}}
-<div class="ui list">
+<div class="ui inbox middle very relaxed page grid one cards">
     {{range .Mail}}
-        <div class="item">
-            <div class="ui grid">
-                <div class="ui two wide column middle aligned center">
-                    <svg class="ui basic icon avatar" data-jdenticon-value="{{.From}}"></svg>
-                </div>
-                <div class="ui fourteen wide column no-padding-left">
-                    <div class="ui header">
-                        <span class="name">{{.Subject}}</span>
+        <div class="ui card">
+            <div class="ui content">
+                <div class="ui grid">
+                    <div class="ui five wide column header">
+                        <svg class="basic icon avatar image" data-jdenticon-value="{{.From}}"></svg>
+                        {{.From}}
                     </div>
-                    <p class="has-emoji">{{.Body | Str2HTML}}</p>
-                    <p class="time">{{.Received}}</p>
+                    <div class="nine wide column header"><h2>{{.Subject}}</h2></div>
+                    <div class="two wide column header right aligned floated">{{HumanTimeSince .Sent}}</div>
                 </div>
+            </div>
+            <div class="content very padded text">
+                {{.Body}}
             </div>
         </div>
     {{end}}
