@@ -70,9 +70,7 @@ func NewSMTPServer() {
 	be := &Backend{}
 
 	s := smtp.NewServer(be)
-	sec := setting.Cfg.Section("database")
-
-	s.Addr = ":" + sec.Key("PORT").MustString("1025")
+	s.Addr = ":" + setting.MailPort
 	s.Domain = setting.AppDomain
 	s.ReadTimeout = 10 * time.Second
 	s.WriteTimeout = 10 * time.Second

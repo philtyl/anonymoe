@@ -41,6 +41,7 @@ var (
 	SessionConfig session.Options
 
 	// Mail settings
+	MailPort        string
 	PrivateAccounts []string
 )
 
@@ -111,6 +112,7 @@ func NewContext() (err error) {
 	DatabasePath = path.Join(InstallPath, dbSec.Key("PATH").MustString("anonymail.db"))
 
 	mailSec := Cfg.Section("mail")
+	MailPort = mailSec.Key("PORT").MustString("1025")
 	PrivateAccounts = strings.Split(mailSec.Key("PRIVATE_ACCOUNTS").MustString("hostmaster"), ",")
 
 	return err
