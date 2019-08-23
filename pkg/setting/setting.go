@@ -8,9 +8,9 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/Unknwon/com"
 	"github.com/go-macaron/session"
 	"github.com/philtyl/anonymoe/pkg/bindata"
+	"github.com/unknwon/com"
 	"gopkg.in/ini.v1"
 )
 
