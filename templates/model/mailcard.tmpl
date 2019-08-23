@@ -1,0 +1,15 @@
+<div class="ui card">
+    <div class="ui content">
+        <div class="ui grid">
+            <div class="ui five wide column header">
+                <svg class="basic icon avatar image" data-jdenticon-value="{{.From}}"></svg>
+                {{.From}}
+            </div>
+            <div class="nine wide column header"><h2>{{.Subject}}</h2></div>
+            <div class="two wide column header right aligned floated">{{HumanTimeSince .Sent}}</div>
+        </div>
+    </div>
+    <div class="content very padded text">
+        {{.Body}}
+    </div>
+</div>

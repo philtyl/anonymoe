@@ -55,6 +55,7 @@ func runWeb(c *cli.Context) error {
 	m.Get("/", routes.Home)
 	m.Get("/inbox", routes.NewInbox)
 	m.Get("/inbox/:user", routes.Inbox)
+	m.Get("/inbox/:user/node", routes.InboxNode)
 	m.NotFound(routes.Home)
 
 	listenAddr := fmt.Sprintf("%s:%s", setting.HTTPAddr, setting.HTTPPort)

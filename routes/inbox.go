@@ -1,17 +1,18 @@
 package routes
 
 import (
+	"log"
 	"strings"
 
 	"anonymoe/models"
 	"anonymoe/pkg/context"
 	"anonymoe/pkg/setting"
 	"github.com/Pallinder/go-randomdata"
-	"github.com/lunny/log"
 )
 
 const (
-	INBOX = "inbox"
+	INBOX      = "inbox"
+	INBOX_NODE = "model/mailinbox"
 )
 
 func NewInbox(c *context.Context) {
@@ -19,6 +20,16 @@ func NewInbox(c *context.Context) {
 }
 
 func Inbox(c *context.Context) {
+	InboxContents(c)
+	c.Success(INBOX)
+}
+
+func InboxNode(c *context.Context) {
+	InboxContents(c)
+	c.Success(INBOX_NODE)
+}
+
+func InboxContents(c *context.Context) {
 	username := strings.ToLower(c.Params(":user"))
 	c.Data["User"] = username
 
@@ -26,13 +37,11 @@ func Inbox(c *context.Context) {
 		c.Data["Private"] = true
 	} else {
 		mail, err := models.GetMail(username)
-		log.Infof("Mail for %s: %+v", username, mail)
+		log.Printf("Mail for %s: %+v", username, mail)
 		if err == nil {
 			c.Data["Mail"] = mail
 		} else {
-			log.Infof("Error loading mail for '%s': %v", username, err)
+			log.Printf("Error loading mail for '%s': %v", username, err)
 		}
 	}
-
-	c.Success(INBOX)
 }

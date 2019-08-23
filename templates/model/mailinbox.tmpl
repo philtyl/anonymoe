@@ -1,0 +1,5 @@
+<div class="ui inbox middle very relaxed page grid one cards">
+    {{range .Mail}}
+        {{template "model/mailcard" .}}
+    {{end}}
+</div>
