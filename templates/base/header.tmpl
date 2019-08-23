@@ -1,23 +1,23 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
     <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
 
-    <meta name="author" content="{{AppName}}" />
-    <meta name="description" content="{{AppName}} is an open source anonymous password-less email client." />
+    <meta name="author" content="{{AppName}}"/>
+    <meta name="description" content="{{AppName}} is an open source anonymous password-less email client."/>
     <meta name="keywords" content="{{AppName}}, email, anonymous, mail">
-    <meta name="referrer" content="no-referrer" />
+    <meta name="referrer" content="no-referrer"/>
 
     <!-- Open Graph Tags -->
-    <meta property="og:url" content="{{AppURL}}" />
-    <meta property="og:type" content="website" />
+    <meta property="og:url" content="{{AppURL}}"/>
+    <meta property="og:type" content="website"/>
     <meta property="og:title" content="{{AppName}}">
     <meta property="og:description" content="{{AppName}} is an open source anonymous password-less email client.">
-    <meta property="og:image" content="{{AppURL}}/img/anony-lg.png" />
+    <meta property="og:image" content="{{AppURL}}/img/anony-lg.png"/>
     <meta property="og:site_name" content="Gogs">
 
-    <link rel="shortcut icon" href="{{AppURL}}/img/favicon.png" />
+    <link rel="shortcut icon" href="{{AppURL}}/img/favicon.png"/>
 
     <!-- Stylesheet -->
     <link rel="stylesheet" type="text/css" href="{{AppURL}}/css/semantic-2.4.1.min.css">
@@ -34,43 +34,49 @@
     <title>{{AppName}}{{if .User}} - {{.User}}{{end}}</title>
 </head>
 <body>
-    <div class="full height">
-        <noscript>This website works better with JavaScript</noscript>
-        <div class="following bar light">
-            <div class="ui container">
-                <div class="ui grid">
-                    <div class="column">
-                        <div class="ui top secondary menu">
-                            <a class="item brand" href="{{AppURL}}/">
-                                <img class="ui mini image" src="{{AppURL}}/img/logo.png">
-                            </a>
-                            <a class="item" href="{{AppURL}}/">Home</a>
+<div class="full height">
+    <noscript>This website works better with JavaScript</noscript>
+    <div class="following bar light">
+        <div class="ui container">
+            <div class="ui grid">
+                <div class="column">
+                    <div class="ui top secondary menu">
+                        <a class="item brand" href="{{AppURL}}/">
+                            <img class="ui mini image" src="{{AppURL}}/img/logo.png">
+                        </a>
+                        <a class="item" href="{{AppURL}}/">Home</a>
 
-                            <div class="right menu">
-                                {{if .User}}
-                                    <div class="ui action small input" id="user-email-panel">
-                                        <svg class="ui basic icon avatar" data-jdenticon-value="{{.User}}"></svg>
-                                        <input id="user-email" value="{{.User}}@{{AppDomain}}" readonly>
-                                        <button class="ui basic icon button poping up clipboard" id="clipboard-btn" data-original="Copy" data-success="Copied!" data-error="Press ⌘-C or Ctrl-C to copy" data-content="Copy" data-variation="inverted tiny" data-clipboard-target="#user-email">
-                                            <i class="octicon octicon-clippy"></i>
-                                        </button>
-                                        <button class="ui basic icon button poping up" id="reidentify-btn" data-content="New Account" data-variation="inverted tiny" onclick="window.location.href = '{{AppURL}}/inbox';">
-                                            <i class="octicon octicon-sync"></i>
-                                        </button>
-                                    </div>
-                                {{else}}
-                                    <div class="ui action small input" id="claim-email-panel">
-                                        <button class="ui basic button" id="identify-btn" onclick="window.location.href = '{{AppURL}}/inbox';">
-                                            Create New Account
-                                        </button>
-                                    </div>
-                                {{end}}
-                            </div>
+                        <div class="right menu">
+                            {{if .User}}
+                                <div class="ui action small input" id="user-email-panel">
+                                    <svg class="ui basic icon avatar" data-jdenticon-value="{{.User}}"></svg>
+                                    <input id="user-email" value="{{.User}}@{{AppDomain}}" readonly>
+                                    <button class="ui basic icon button poping up clipboard" id="clipboard-btn"
+                                            data-original="Copy" data-success="Copied!"
+                                            data-error="Press ⌘-C or Ctrl-C to copy" data-content="Copy"
+                                            data-variation="inverted tiny" data-clipboard-target="#user-email">
+                                        <i class="octicon octicon-clippy"></i>
+                                    </button>
+                                    <button class="ui basic icon button poping up" id="reidentify-btn"
+                                            data-content="New Account" data-variation="inverted tiny"
+                                            onclick="window.location.href = '{{AppURL}}/inbox';">
+                                        <i class="octicon octicon-sync"></i>
+                                    </button>
+                                </div>
+                            {{else}}
+                                <div class="ui action small input" id="claim-email-panel">
+                                    <button class="ui basic button" id="identify-btn"
+                                            onclick="window.location.href = '{{AppURL}}/inbox';">
+                                        Create New Account
+                                    </button>
+                                </div>
+                            {{end}}
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+    </div>
 {{/*
     </div>
 </body>
