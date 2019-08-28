@@ -7,8 +7,8 @@ import (
 
 	"github.com/DusanKasan/parsemail"
 	"github.com/go-xorm/xorm"
-	"github.com/lunny/log"
 	"github.com/philtyl/anonymoe/pkg/setting"
+	log "gopkg.in/clog.v1"
 )
 
 type MailRecipient struct {
@@ -53,12 +53,15 @@ func createMail(e *xorm.Session, raw *RawMailItem) (_ *Mail, _ []MailRecipient, 
 	r := strings.NewReader(raw.Data)
 	m, err := mail.ReadMessage(r)
 	if err != nil {
+		log.Warn("Unable to parse raw email data: %v", err)
 		return
 	}
+	log.Trace("Mail Item: %+v", m)
 
 	header := m.Header
 	body, err := parsemail.Parse(m.Body)
 	if err != nil {
+		log.Warn("Unable to parse email body: %v", err)
 		return
 	}
 
@@ -92,7 +95,7 @@ func createMail(e *xorm.Session, raw *RawMailItem) (_ *Mail, _ []MailRecipient, 
 				recipients = append(recipients, *mailRecipient)
 			}
 		} else {
-			log.Infof("Receiving mail for outside address: %s, skipping linkage...", recipient)
+			log.Info("Receiving mail for outside address: %s, skipping linkage...", recipient)
 		}
 	}
 

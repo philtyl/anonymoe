@@ -5,8 +5,8 @@ import (
 	"time"
 
 	"github.com/go-xorm/xorm"
-	"github.com/lunny/log"
 	"github.com/philtyl/anonymoe/pkg/setting"
+	log "gopkg.in/clog.v1"
 )
 
 type User struct {
@@ -29,9 +29,9 @@ func (u *User) AfterSet(colName string, _ xorm.Cell) {
 }
 
 func (u *User) getUserMail() (mailItems []*Mail, err error) {
-	log.Infof("loading mail items for '%s'", u.Name)
+	log.Info("loading mail items for '%s'", u.Name)
 	count, err := getUserMailCount(u)
-	log.Infof("%d mail items found for '%s'", count, u.Name)
+	log.Info("%d mail items found for '%s'", count, u.Name)
 	if err != nil {
 		return
 	}
@@ -61,7 +61,7 @@ func getUserByName(name string) (user *User, has bool, err error) {
 		Name: name,
 	}
 	has, err = x.Get(user)
-	log.Infof("user: %+v, has: %b, err: %+v", user, has, err)
+	log.Trace("user: %+v, has: %b, err: %+v", user, has, err)
 	return user, has, err
 }
 
@@ -82,7 +82,7 @@ func GetOrCreateUserByName(e *xorm.Session, name string) (user *User, err error)
 		if err != nil {
 			return nil, err
 		}
-		log.Infof("Created User: %+v", user)
+		log.Info("Created User: %+v", user)
 	}
 
 	return user, nil
