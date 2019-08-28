@@ -1,11 +1,11 @@
 package models
 
 import (
-	"io/ioutil"
 	"net/mail"
 	"strings"
 	"time"
 
+	"github.com/DusanKasan/parsemail"
 	"github.com/go-xorm/xorm"
 	"github.com/lunny/log"
 	"github.com/philtyl/anonymoe/pkg/setting"
@@ -57,7 +57,7 @@ func createMail(e *xorm.Session, raw *RawMailItem) (_ *Mail, _ []MailRecipient, 
 	}
 
 	header := m.Header
-	body, err := ioutil.ReadAll(m.Body)
+	body, err := parsemail.Parse(m.Body)
 	if err != nil {
 		return
 	}
@@ -68,7 +68,7 @@ func createMail(e *xorm.Session, raw *RawMailItem) (_ *Mail, _ []MailRecipient, 
 		Sent:     sent,
 		Received: time.Now(),
 		Subject:  header.Get("Subject"),
-		Body:     string(body),
+		Body:     body.HTMLBody,
 	}
 	if _, err = e.Insert(mailItem); err != nil {
 		return nil, nil, err
