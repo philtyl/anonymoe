@@ -10,7 +10,7 @@ import (
 
 func SetupLogger(logName string) {
 	level := log.TRACE
-	_ := log.New(log.FILE, log.FileConfig{
+	err := log.New(log.FILE, log.FileConfig{
 		Level:    level,
 		Filename: filepath.Join(setting.InstallDir(), "logs", logName),
 		FileRotationConfig: log.FileRotationConfig{
@@ -19,7 +19,11 @@ func SetupLogger(logName string) {
 			MaxDays: 3,
 		},
 	})
-	log.Delete(log.CONSOLE) // Remove primary logger
+	if err != nil {
+		log.Warn("Unable to start file logger, defaulting to STDOUT: %v", err)
+	} else {
+		log.Delete(log.CONSOLE) // Remove primary logger
+	}
 }
 
 func stringFlag(name, value, usage string) cli.StringFlag {
