@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"fmt"
-	"log"
 	"net/http"
 	"path"
 
@@ -14,6 +13,7 @@ import (
 	"github.com/philtyl/anonymoe/pkg/template"
 	"github.com/philtyl/anonymoe/routes"
 	"github.com/urfave/cli"
+	log "gopkg.in/clog.v1"
 	"gopkg.in/macaron.v1"
 )
 
@@ -28,11 +28,13 @@ var Server = cli.Command{
 }
 
 func StartServer(c *cli.Context) error {
+	SetupLogger("server.log")
+
 	if err := setting.NewContext(); err != nil {
-		log.Fatalf("Unable to initialize settings context: %v", err)
+		log.Fatal(2, "Unable to initialize settings context: %v", err)
 	}
 	if err := models.SetEngine(); err != nil {
-		log.Fatalf("Internal error: SetEngine: %v", err)
+		log.Fatal(2, "Internal error: SetEngine: %v", err)
 	}
 
 	if c.Bool("start") {
@@ -40,11 +42,9 @@ func StartServer(c *cli.Context) error {
 		return runWeb(c)
 	} else if c.Bool("info") {
 		if err := setting.NewContext(); err != nil {
-			log.Fatalf("Unable to initialize settings context: %v", err)
+			log.Fatal(2, "Unable to initialize settings context: %v", err)
 		}
 
-	} else {
-		log.Fatalf("")
 	}
 	return nil
 }
@@ -59,14 +59,14 @@ func runWeb(c *cli.Context) error {
 	m.NotFound(routes.Home)
 
 	listenAddr := fmt.Sprintf("%s:%s", setting.HTTPAddr, setting.HTTPPort)
-	log.Printf("Listen: %v://%s%s", setting.Protocol, listenAddr, setting.AppURL)
+	log.Info("Listen: %v://%s%s", setting.Protocol, listenAddr, setting.AppURL)
 
 	var err error
 	server := &http.Server{Addr: listenAddr, Handler: m}
 	err = server.ListenAndServe()
 
 	if err != nil {
-		log.Fatalf("Failed to start server: %v", err)
+		log.Fatal(2, "Failed to start server: %v", err)
 	}
 
 	return nil

@@ -1,7 +1,6 @@
 package setting
 
 import (
-	"log"
 	"os"
 	"os/exec"
 	"path"
@@ -11,6 +10,7 @@ import (
 	"github.com/go-macaron/session"
 	"github.com/philtyl/anonymoe/pkg/bindata"
 	"github.com/unknwon/com"
+	log "gopkg.in/clog.v1"
 	"gopkg.in/ini.v1"
 )
 
@@ -58,7 +58,7 @@ func init() {
 	AppVer = string(bindata.MustAsset("conf/VERSION"))
 	var err error
 	if AppPath, err = execPath(); err != nil {
-		log.Fatalf("Fail to get app path: %v\n", err)
+		log.Fatal(2, "Fail to get app path: %v\n", err)
 	}
 	AppPath = strings.Replace(AppPath, "\\", "/", -1)
 }
@@ -86,15 +86,15 @@ func NewContext() (err error) {
 		IgnoreInlineComment: true,
 	}, CfgFilePath)
 	if err != nil {
-		log.Fatalf("Fail to parse 'app.ini': %v", err)
+		log.Fatal(2, "Fail to parse 'app.ini': %v", err)
 	}
 
 	if com.IsFile(CfgFilePath) {
 		if err = Cfg.Append(CfgFilePath); err != nil {
-			log.Fatalf("Fail to load custom config '%s': %v", CfgFilePath, err)
+			log.Fatal(2, "Fail to load custom config '%s': %v", CfgFilePath, err)
 		}
 	} else {
-		log.Fatalf("Install config '%s' not found, please install server", CfgFilePath)
+		log.Fatal(2, "Install config '%s' not found, please install server", CfgFilePath)
 	}
 	Cfg.NameMapper = ini.AllCapsUnderscore
 

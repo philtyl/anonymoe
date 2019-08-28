@@ -1,13 +1,13 @@
 package routes
 
 import (
-	"log"
 	"strings"
 
 	"github.com/Pallinder/go-randomdata"
 	"github.com/philtyl/anonymoe/models"
 	"github.com/philtyl/anonymoe/pkg/context"
 	"github.com/philtyl/anonymoe/pkg/setting"
+	log "gopkg.in/clog.v1"
 )
 
 const (
@@ -37,11 +37,11 @@ func InboxContents(c *context.Context) {
 		c.Data["Private"] = true
 	} else {
 		mail, err := models.GetMail(username)
-		log.Printf("Mail for %s: %+v", username, mail)
+		log.Info("Mail for %s: %+v", username, mail)
 		if err == nil {
 			c.Data["Mail"] = mail
 		} else {
-			log.Printf("Error loading mail for '%s': %v", username, err)
+			log.Info("Error loading mail for '%s': %v", username, err)
 		}
 	}
 }

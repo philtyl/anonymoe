@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"log"
 	"os"
 	"path"
 
@@ -9,6 +8,7 @@ import (
 	"github.com/philtyl/anonymoe/pkg/bindata"
 	"github.com/philtyl/anonymoe/pkg/setting"
 	"github.com/urfave/cli"
+	log "gopkg.in/clog.v1"
 )
 
 var Install = cli.Command{
@@ -24,29 +24,31 @@ var Install = cli.Command{
 }
 
 func InstallServer(c *cli.Context) (err error) {
+	SetupLogger("install.log")
+
 	if c.Bool("init") {
 		installPath := setting.InstallDir()
 		installConfigFile := path.Join(installPath, "app.ini")
 		if fileExists(installConfigFile) {
 			if !c.Bool("force") {
-				log.Fatalf("Configuration file [%s] already exists, please run with --force flag to overwrite", installConfigFile)
+				log.Fatal(2, "Configuration file [%s] already exists, please run with --force flag to overwrite", installConfigFile)
 			}
 		}
 		if err = copyConf("conf/app.ini", installConfigFile); err != nil {
-			log.Fatalf("Failed to initialize 'app.ini' to '%s': %v", installConfigFile, err)
+			log.Fatal(2, "Failed to initialize 'app.ini' to '%s': %v", installConfigFile, err)
 		}
 		if err = setting.NewContext(); err != nil {
-			log.Fatalf("Failed to initialize settings engine: %v", err)
+			log.Fatal(2, "Failed to initialize settings engine: %v", err)
 		}
 		if err = models.NewEngine(); err != nil {
-			log.Fatalf("Failed to initialize ORM engine: %v", err)
+			log.Fatal(2, "Failed to initialize ORM engine: %v", err)
 		}
 	} else if c.Bool("migrate") {
 		if err = setting.NewContext(); err != nil {
-			log.Fatalf("Failed to initialize settings engine: %v", err)
+			log.Fatal(2, "Failed to initialize settings engine: %v", err)
 		}
 		if err = models.NewEngine(); err != nil {
-			log.Fatalf("Failed to initialize ORM engine: %v", err)
+			log.Fatal(2, "Failed to initialize ORM engine: %v", err)
 		}
 	}
 

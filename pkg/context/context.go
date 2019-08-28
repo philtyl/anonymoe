@@ -3,12 +3,12 @@ package context
 import (
 	"fmt"
 	"io"
-	"log"
 	"net/http"
 	"time"
 
 	"github.com/go-macaron/session"
 	"github.com/philtyl/anonymoe/pkg/template"
+	log "gopkg.in/clog.v1"
 	"gopkg.in/macaron.v1"
 )
 
@@ -26,7 +26,7 @@ func (c *Context) IsLogged() bool {
 
 // HTML responses template with given status.
 func (c *Context) HTML(status int, name string) {
-	log.Printf("Template: %s", name)
+	log.Info("Template: %s", name)
 	c.Context.HTML(status, name)
 }
 
@@ -58,7 +58,7 @@ func (c *Context) Handle(status int, title string, err error) {
 		c.Data["Title"] = "Page Not Found"
 	case http.StatusInternalServerError:
 		c.Data["Title"] = "Internal Server Error"
-		log.Fatalf("%s: %v", title, err)
+		log.Fatal(2, "%s: %v", title, err)
 	}
 	c.HTML(status, fmt.Sprintf("status/%d", status))
 }
@@ -114,7 +114,7 @@ func Contexter() macaron.Handler {
 			Flash:   f,
 			Session: sess,
 		}
-		log.Printf("Session ID: %s", sess.ID())
+		log.Info("Session ID: %s", sess.ID())
 		ctx.Map(c)
 	}
 }

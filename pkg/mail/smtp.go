@@ -3,13 +3,12 @@ package mail
 import (
 	"io"
 	"io/ioutil"
-	"log"
 	"time"
-
-	"github.com/philtyl/anonymoe/pkg/setting"
 
 	"github.com/emersion/go-smtp"
 	"github.com/philtyl/anonymoe/models"
+	"github.com/philtyl/anonymoe/pkg/setting"
+	log "gopkg.in/clog.v1"
 )
 
 // The Backend implements SMTP server methods.
@@ -54,9 +53,9 @@ func (s *Session) Reset() {
 	if s.Item.Complete {
 		mail, recipients, err := models.CreateMail(s.Item)
 		if err == nil {
-			log.Printf("Mail Received: %+v\nSent to: %+v", mail, recipients)
+			log.Info("Mail Received: %+v\nSent to: %+v", mail, recipients)
 		} else {
-			log.Printf("Error Finalizing Mail Item: %v", err)
+			log.Info("Error Finalizing Mail Item: %v", err)
 		}
 	}
 	s.Item = new(models.RawMailItem)
