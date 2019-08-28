@@ -62,7 +62,7 @@ func createMail(e *xorm.Session, raw *RawMailItem) (_ *Mail, _ []MailRecipient, 
 		return
 	}
 
-	sent, _ := time.Parse("Thu, 21 May 2008 05:33:29", header.Get("Date"))
+	sent, _ := header.Date()
 	mailItem := &Mail{
 		From:     raw.From,
 		Sent:     sent,
