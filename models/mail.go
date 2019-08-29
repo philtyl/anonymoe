@@ -39,6 +39,20 @@ func (m *Mail) BeforeInsert() {
 	m.ReceivedUnix = time.Now().Unix()
 }
 
+func (m *Mail) AfterSet(colName string, _ xorm.Cell) {
+	switch colName {
+	case "received":
+		m.ReceivedUnix = m.Received.Unix()
+	case "sent":
+		m.SentUnix = m.Sent.Unix()
+	}
+}
+
+func (m *Mail) AfterLoad() {
+	m.Received = time.Unix(m.ReceivedUnix, 0).Local()
+	m.Sent = time.Unix(m.SentUnix, 0).Local()
+}
+
 func createMail(e *xorm.Session, raw *RawMailItem) (_ *Mail, _ []MailRecipient, err error) {
 	log.Trace("Raw Mail Item:\n%+v\n", raw)
 	r := strings.NewReader(raw.Data)
@@ -48,15 +62,12 @@ func createMail(e *xorm.Session, raw *RawMailItem) (_ *Mail, _ []MailRecipient, 
 		return
 	}
 
-	now := time.Now()
 	mailItem := &Mail{
-		From:         raw.From,
-		Sent:         m.Date,
-		SentUnix:     m.Date.Unix(),
-		Received:     now,
-		ReceivedUnix: now.Unix(),
-		Subject:      m.Subject,
-		Body:         m.HTMLBody,
+		From:     raw.From,
+		Sent:     m.Date,
+		Received: time.Now(),
+		Subject:  m.Subject,
+		Body:     m.HTMLBody,
 	}
 	if _, err = e.Insert(mailItem); err != nil {
 		return nil, nil, err
