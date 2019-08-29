@@ -1,6 +1,8 @@
 package models
 
 import (
+	"io/ioutil"
+	"mime/quotedprintable"
 	"strings"
 	"time"
 
@@ -58,7 +60,11 @@ func createMail(e *xorm.Session, raw *RawMailItem) (_ *Mail, _ []MailRecipient, 
 
 	body := m.HTMLBody
 	if len(body) == 0 {
-		body = m.TextBody
+		bytesBody, err := ioutil.ReadAll(quotedprintable.NewReader(strings.NewReader(m.TextBody)))
+		if err != nil {
+			log.Warn("Unable to parse text message")
+		}
+		body = string(bytesBody)
 	}
 
 	mailItem := &Mail{
