@@ -55,7 +55,7 @@ func (u *User) getUserMail() (mailItems []*Mail, err error) {
 		}
 	}
 	sort.Slice(mailItems, func(i, j int) bool {
-		return mailItems[i].ReceivedUnix < mailItems[j].ReceivedUnix
+		return mailItems[i].ReceivedUnix > mailItems[j].ReceivedUnix
 	})
 	return
 }
