@@ -48,10 +48,12 @@ function refreshInboxFeed() {
             newFeed.style.visibility = 'hidden';
             newFeed.innerHTML = xhr.responseText;
             feed.parentElement.appendChild(newFeed);
-            feed.parentElement.removeChild(feed);
-            newFeed.style.visibility = 'visible';
-            jdenticon();
-            newFeed.setAttribute("id", "inboxfeed");
+            document.addEventListener('DOMContentLoaded', (event) => {
+                feed.parentElement.removeChild(feed);
+                newFeed.style.visibility = 'visible';
+                jdenticon();
+                newFeed.setAttribute("id", "inboxfeed");
+            });
         }
     };
 
