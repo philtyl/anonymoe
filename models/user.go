@@ -28,6 +28,10 @@ func (u *User) AfterSet(colName string, _ xorm.Cell) {
 	}
 }
 
+func (u *User) AfterLoad() {
+	u.Created = time.Unix(u.CreatedUnix, 0).Local()
+}
+
 func (u *User) getUserMail() (mailItems []*Mail, err error) {
 	log.Info("loading mail items for '%s'", u.Name)
 	count, err := getUserMailCount(u)
