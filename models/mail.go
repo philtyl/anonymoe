@@ -56,7 +56,7 @@ func createMail(e *xorm.Session, raw *RawMailItem) (_ *Mail, _ []MailRecipient, 
 		log.Warn("Unable to parse raw email data: %v", err)
 		return
 	}
-	log.Trace("Mail Item: %+v", m)
+	log.Trace("Mail Item: %+v\nBody: %+v", m, m.Body)
 
 	header := m.Header
 	body, err := parsemail.Parse(m.Body)
