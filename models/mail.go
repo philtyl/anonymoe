@@ -1,6 +1,7 @@
 package models
 
 import (
+	"io/ioutil"
 	"net/mail"
 	"strings"
 	"time"
@@ -56,7 +57,8 @@ func createMail(e *xorm.Session, raw *RawMailItem) (_ *Mail, _ []MailRecipient, 
 		log.Warn("Unable to parse raw email data: %v", err)
 		return
 	}
-	log.Trace("Mail Item: %+v\nBody: %+v", m, m.Body)
+	bodyText, _ := ioutil.ReadAll(m.Body)
+	log.Trace("Mail Item: %+v\nBody: %+v", m, string(bodyText))
 
 	header := m.Header
 	body, err := parsemail.Parse(m.Body)
