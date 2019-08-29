@@ -43,7 +43,7 @@ func NewFuncMap() []template.FuncMap {
 		"Str2HTML": func(raw string) template.HTML {
 			return template.HTML(raw) //TODO Sanatize
 		},
-		"HumanTimeSince": func(then time.Time) string {
+		"HumanTimeSince": func(then int64) string {
 			return tool.HumanTimeSince(then)
 		},
 	}}

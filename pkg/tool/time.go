@@ -17,10 +17,8 @@ const (
 	Year   = 12 * Month
 )
 
-func HumanTimeSince(then time.Time) string {
-	now := time.Now()
-	diff := now.Unix() - then.Unix()
-	log.Trace("HumanTimeSince[now:%v, then:%v, diff:%d]", now, then, diff)
+func HumanTimeSince(then int64) string {
+	diff := time.Now().Unix() - then
 
 	switch {
 	case diff <= 0:

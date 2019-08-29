@@ -22,9 +22,9 @@ type Mail struct {
 	Subject string
 	Body    string `xorm:"TEXT"`
 
-	Received     time.Time `xorm:"-" json:"-"`
-	ReceivedUnix int64
-	Sent         time.Time `xorm:"-" json:"-"`
+	Received     time.Time `xorm:"created"`
+	ReceivedUnix int64     `xorm:"created"`
+	Sent         time.Time
 	SentUnix     int64
 }
 
@@ -35,14 +35,8 @@ type RawMailItem struct {
 	Complete  bool
 }
 
-func (m *Mail) BeforeInsert() {
-	m.ReceivedUnix = time.Now().Unix()
-}
-
 func (m *Mail) AfterSet(colName string, _ xorm.Cell) {
 	switch colName {
-	case "received":
-		m.ReceivedUnix = m.Received.Unix()
 	case "sent":
 		m.SentUnix = m.Sent.Unix()
 	}
@@ -63,11 +57,10 @@ func createMail(e *xorm.Session, raw *RawMailItem) (_ *Mail, _ []MailRecipient, 
 	}
 
 	mailItem := &Mail{
-		From:     raw.From,
-		Sent:     m.Date,
-		Received: time.Now(),
-		Subject:  m.Subject,
-		Body:     m.HTMLBody,
+		From:    raw.From,
+		Sent:    m.Date,
+		Subject: m.Subject,
+		Body:    m.HTMLBody,
 	}
 	if _, err = e.Insert(mailItem); err != nil {
 		return nil, nil, err

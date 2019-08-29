@@ -13,23 +13,8 @@ type User struct {
 	Id   int64
 	Name string `xorm:"UNIQUE NOT NULL"`
 
-	Created     time.Time `xorm:"-" json:"-"`
-	CreatedUnix int64
-}
-
-func (u *User) BeforeInsert() {
-	u.CreatedUnix = time.Now().Unix()
-}
-
-func (u *User) AfterSet(colName string, _ xorm.Cell) {
-	switch colName {
-	case "created_unix":
-		u.Created = time.Unix(u.CreatedUnix, 0).Local()
-	}
-}
-
-func (u *User) AfterLoad() {
-	u.Created = time.Unix(u.CreatedUnix, 0).Local()
+	Created     time.Time `xorm:"created"`
+	CreatedUnix int64     `xorm:"created"`
 }
 
 func (u *User) getUserMail() (mailItems []*Mail, err error) {
