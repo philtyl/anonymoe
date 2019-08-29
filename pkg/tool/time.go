@@ -3,8 +3,6 @@ package tool
 import (
 	"strconv"
 	"time"
-
-	log "gopkg.in/clog.v1"
 )
 
 // Seconds-based time units
