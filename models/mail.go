@@ -1,7 +1,6 @@
 package models
 
 import (
-	"io"
 	"strings"
 	"time"
 
@@ -32,7 +31,7 @@ type Mail struct {
 type RawMailItem struct {
 	From      string
 	Recipient []string
-	Data      io.Reader
+	Data      string
 	Complete  bool
 }
 
@@ -50,8 +49,9 @@ func (m *Mail) AfterSet(colName string, _ xorm.Cell) {
 }
 
 func createMail(e *xorm.Session, raw *RawMailItem) (_ *Mail, _ []MailRecipient, err error) {
-	log.Trace("Raw Mail Item: %+v:\n", raw)
-	m, err := parsemail.Parse(raw.Data)
+	log.Trace("Raw Mail Item:\n%+v\n", raw)
+	r := strings.NewReader(raw.Data)
+	m, err := parsemail.Parse(r)
 	if err != nil {
 		log.Warn("Unable to parse raw email data: %v", err)
 		return
