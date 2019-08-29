@@ -6,9 +6,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/DusanKasan/parsemail"
 	"github.com/go-xorm/xorm"
 	"github.com/philtyl/anonymoe/pkg/setting"
+	"github.com/philtyl/parsemail"
 	log "gopkg.in/clog.v1"
 )
 
