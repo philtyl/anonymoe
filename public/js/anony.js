@@ -49,6 +49,8 @@ function refreshInboxFeed() {
             newFeed.innerHTML = xhr.responseText;
             feed.parentElement.appendChild(newFeed);
             document.addEventListener('DOMContentLoaded', (event) => {
+                const feed = document.getElementById("inboxfeed");
+                const newFeed = document.getElementById("newinboxfeed");
                 feed.parentElement.removeChild(feed);
                 newFeed.style.visibility = 'visible';
                 jdenticon();
