@@ -43,14 +43,14 @@ function refreshInboxFeed() {
     const xhr = new XMLHttpRequest();
     xhr.onreadystatechange = function () {
         if (xhr.readyState === 4 && xhr.status === 200) {
-            var newFeed = document.createElement('div');
-            newFeed.setAttribute("id", "inboxfeed");
-            newFeed.setAttribute("class", feed.getAttribute("class"));
+            const newFeed = document.createElement('div');
+            newFeed.setAttribute("id", "newinboxfeed");
             newFeed.style.visibility = 'hidden';
             feed.parentElement.appendChild(newFeed);
             feed.parentElement.removeChild(feed);
             newFeed.style.visibility = 'visible';
             jdenticon();
+            newFeed.setAttribute("id", "inboxfeed");
         }
     };
 
