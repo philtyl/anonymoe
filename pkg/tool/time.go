@@ -3,6 +3,8 @@ package tool
 import (
 	"strconv"
 	"time"
+
+	log "gopkg.in/clog.v1"
 )
 
 // Seconds-based time units
@@ -18,6 +20,7 @@ const (
 func HumanTimeSince(then time.Time) string {
 	now := time.Now()
 	diff := now.Unix() - then.Unix()
+	log.Trace("HumanTimeSince[now:%v, then:%v, diff:%d]", now, then, diff)
 
 	switch {
 	case diff <= 0:
