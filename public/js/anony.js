@@ -46,6 +46,7 @@ function refreshInboxFeed() {
             const newFeed = document.createElement('div');
             newFeed.setAttribute("id", "newinboxfeed");
             newFeed.style.visibility = 'hidden';
+            newFeed.innerHTML = xhr.responseText;
             feed.parentElement.appendChild(newFeed);
             feed.parentElement.removeChild(feed);
             newFeed.style.visibility = 'visible';
