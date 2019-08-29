@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/go-xorm/xorm"
+	"github.com/jaytaylor/html2text"
 	"github.com/philtyl/anonymoe/pkg/setting"
 	"github.com/philtyl/parsemail"
 	log "gopkg.in/clog.v1"
@@ -19,10 +20,11 @@ type MailRecipient struct {
 }
 
 type Mail struct {
-	Id      int64
-	From    string
-	Subject string
-	Body    string `xorm:"TEXT"`
+	Id       int64
+	From     string
+	Subject  string
+	Body     string `xorm:"TEXT"`
+	TextBody string `xorm:"-"`
 
 	Received     time.Time `xorm:"created"`
 	ReceivedUnix int64     `xorm:"created"`
@@ -41,10 +43,13 @@ func (m *Mail) AfterSet(colName string, _ xorm.Cell) {
 	switch colName {
 	case "sent":
 		m.SentUnix = m.Sent.Unix()
+	case "body":
+		m.TextBody, _ = html2text.FromString(m.Body, html2text.Options{PrettyTables: true})
 	}
 }
 
 func (m *Mail) AfterLoad() {
+	m.TextBody, _ = html2text.FromString(m.Body, html2text.Options{PrettyTables: true})
 	m.Received = time.Unix(m.ReceivedUnix, 0).Local()
 	m.Sent = time.Unix(m.SentUnix, 0).Local()
 }
