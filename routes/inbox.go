@@ -39,6 +39,7 @@ func InboxContents(c *context.Context) {
 		mail, err := models.GetMail(username)
 		log.Info("Mail for %s: %+v", username, mail)
 		if err == nil {
+			c.Data["Empty"] = len(mail) == 0
 			c.Data["Mail"] = mail
 		} else {
 			log.Info("Error loading mail for '%s': %v", username, err)
