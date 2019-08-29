@@ -56,11 +56,16 @@ func createMail(e *xorm.Session, raw *RawMailItem) (_ *Mail, _ []MailRecipient, 
 		return
 	}
 
+	body := m.HTMLBody
+	if len(body) == 0 {
+		body = m.TextBody
+	}
+
 	mailItem := &Mail{
 		From:    raw.From,
 		Sent:    m.Date,
 		Subject: m.Subject,
-		Body:    m.HTMLBody,
+		Body:    body,
 	}
 	if _, err = e.Insert(mailItem); err != nil {
 		return nil, nil, err
