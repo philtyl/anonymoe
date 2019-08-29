@@ -33,7 +33,7 @@ func InboxContents(c *context.Context) {
 	username := strings.ToLower(c.Params(":user"))
 	c.Data["User"] = username
 
-	if setting.IsPrivateAccount(username) {
+	if setting.ProdMode && setting.IsPrivateAccount(username) {
 		c.Data["Private"] = true
 	} else {
 		mail, err := models.GetMail(username)

@@ -10,6 +10,9 @@ import (
 
 func SetupLogger(logName string) {
 	level := log.TRACE
+	if setting.ProdMode {
+		level = log.ERROR
+	}
 	err := log.New(log.FILE, log.FileConfig{
 		Level:    level,
 		Filename: filepath.Join(setting.InstallDir(), "logs", logName),

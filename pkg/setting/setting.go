@@ -16,12 +16,12 @@ import (
 
 var (
 	// App settings
-	AppVer      string
-	AppName     string
-	AppURL      string
-	AppDomain   string
-	AppPath     string
-	AppDataPath string
+	AppName   string
+	AppVer    string
+	AppURL    string
+	AppDomain string
+	AppPath   string
+	ProdMode  bool
 
 	// Server settings
 	StaticRootPath string
@@ -99,6 +99,7 @@ func NewContext() (err error) {
 	Cfg.NameMapper = ini.AllCapsUnderscore
 
 	AppName = Cfg.Section("").Key("APP_NAME").MustString("Anonymoe")
+	ProdMode = Cfg.Section("").Key("PRODUCTION_MODE").MustBool(true)
 
 	serverSec := Cfg.Section("server")
 	AppURL = serverSec.Key("ROOT_URL").MustString("http://localhost:3000")
