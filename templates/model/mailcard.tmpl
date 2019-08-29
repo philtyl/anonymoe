@@ -10,6 +10,6 @@
         </div>
     </div>
     <div class="content very padded text">
-        {{Str2HTML .Body}}
+        <iframe srcdoc="{{Str2HTML .Body}}" sandbox></iframe>
     </div>
 </div>
