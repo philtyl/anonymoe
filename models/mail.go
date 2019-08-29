@@ -1,8 +1,7 @@
 package models
 
 import (
-	"io/ioutil"
-	"net/mail"
+	"io"
 	"strings"
 	"time"
 
@@ -33,7 +32,7 @@ type Mail struct {
 type RawMailItem struct {
 	From      string
 	Recipient []string
-	Data      string
+	Data      io.Reader
 	Complete  bool
 }
 
@@ -51,29 +50,19 @@ func (m *Mail) AfterSet(colName string, _ xorm.Cell) {
 }
 
 func createMail(e *xorm.Session, raw *RawMailItem) (_ *Mail, _ []MailRecipient, err error) {
-	r := strings.NewReader(raw.Data)
-	m, err := mail.ReadMessage(r)
+	log.Trace("Raw Mail Item: %+v:\n", raw)
+	m, err := parsemail.Parse(raw.Data)
 	if err != nil {
 		log.Warn("Unable to parse raw email data: %v", err)
 		return
 	}
-	bodyText, _ := ioutil.ReadAll(m.Body)
-	log.Trace("Mail Item: %+v\nBody: %+v", m, string(bodyText))
 
-	header := m.Header
-	body, err := parsemail.Parse(strings.NewReader(string(bodyText)))
-	if err != nil {
-		log.Warn("Unable to parse email body: %v", err)
-		return
-	}
-
-	sent, _ := header.Date()
 	mailItem := &Mail{
 		From:     raw.From,
-		Sent:     sent,
+		Sent:     m.Date,
 		Received: time.Now(),
-		Subject:  header.Get("Subject"),
-		Body:     body.HTMLBody,
+		Subject:  m.Subject,
+		Body:     m.HTMLBody,
 	}
 	if _, err = e.Insert(mailItem); err != nil {
 		return nil, nil, err

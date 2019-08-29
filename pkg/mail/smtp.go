@@ -2,7 +2,6 @@ package mail
 
 import (
 	"io"
-	"io/ioutil"
 	"time"
 
 	"github.com/emersion/go-smtp"
@@ -40,12 +39,8 @@ func (s *Session) Rcpt(to string) error {
 }
 
 func (s *Session) Data(r io.Reader) error {
-	if b, err := ioutil.ReadAll(r); err != nil {
-		return err
-	} else {
-		s.Item.Data = string(b)
-		s.Item.Complete = true
-	}
+	s.Item.Data = r
+	s.Item.Complete = true
 	return nil
 }
 
