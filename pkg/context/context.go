@@ -20,7 +20,7 @@ type Context struct {
 
 // HTML responses template with given status.
 func (c *Context) HTML(status int, name string) {
-	log.Info("Template: %s", name)
+	log.Trace("Template: %s", name)
 	c.Context.HTML(status, name)
 }
 
