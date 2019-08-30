@@ -44,14 +44,22 @@ func (m *Mail) AfterSet(colName string, _ xorm.Cell) {
 	case "sent":
 		m.SentUnix = m.Sent.Unix()
 	case "body":
-		m.TextBody, _ = html2text.FromString(m.Body, html2text.Options{PrettyTables: true})
+		var err error
+		m.TextBody, err = html2text.FromString(m.Body, html2text.Options{PrettyTables: true})
+		if err != nil {
+			log.Warn("Error creating textbody: %v", err)
+		}
 	}
 }
 
 func (m *Mail) AfterLoad() {
-	m.TextBody, _ = html2text.FromString(m.Body, html2text.Options{PrettyTables: true})
 	m.Received = time.Unix(m.ReceivedUnix, 0).Local()
 	m.Sent = time.Unix(m.SentUnix, 0).Local()
+	var err error
+	m.TextBody, err = html2text.FromString(m.Body, html2text.Options{PrettyTables: true})
+	if err != nil {
+		log.Warn("Error creating textbody: %v", err)
+	}
 }
 
 func createMail(e *xorm.Session, raw *RawMailItem) (_ *Mail, _ []MailRecipient, err error) {
