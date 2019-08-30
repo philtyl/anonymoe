@@ -7,7 +7,6 @@ import (
 	"time"
 
 	"github.com/go-xorm/xorm"
-	"github.com/k3a/html2text"
 	"github.com/philtyl/anonymoe/pkg/setting"
 	"github.com/philtyl/parsemail"
 	log "gopkg.in/clog.v1"
@@ -20,11 +19,10 @@ type MailRecipient struct {
 }
 
 type Mail struct {
-	Id       int64
-	From     string
-	Subject  string
-	Body     string `xorm:"TEXT"`
-	TextBody string `xorm:"-"`
+	Id      int64
+	From    string
+	Subject string
+	Body    string `xorm:"TEXT"`
 
 	Received     time.Time `xorm:"created"`
 	ReceivedUnix int64     `xorm:"created"`
@@ -43,15 +41,12 @@ func (m *Mail) AfterSet(colName string, _ xorm.Cell) {
 	switch colName {
 	case "sent":
 		m.SentUnix = m.Sent.Unix()
-	case "body":
-		m.TextBody = html2text.HTML2Text(m.Body)
 	}
 }
 
 func (m *Mail) AfterLoad() {
 	m.Received = time.Unix(m.ReceivedUnix, 0).Local()
 	m.Sent = time.Unix(m.SentUnix, 0).Local()
-	m.TextBody = html2text.HTML2Text(m.Body)
 }
 
 func createMail(e *xorm.Session, raw *RawMailItem) (_ *Mail, _ []MailRecipient, err error) {
@@ -76,7 +71,7 @@ func createMail(e *xorm.Session, raw *RawMailItem) (_ *Mail, _ []MailRecipient, 
 		From:    raw.From,
 		Sent:    m.Date,
 		Subject: m.Subject,
-		Body:    body,
+		Body:    policy.Sanitize(body),
 	}
 	if _, err = e.Insert(mailItem); err != nil {
 		return nil, nil, err

@@ -7,6 +7,7 @@ import (
 
 	"github.com/go-xorm/xorm"
 	_ "github.com/mattn/go-sqlite3"
+	"github.com/microcosm-cc/bluemonday"
 	"github.com/philtyl/anonymoe/pkg/setting"
 	"xorm.io/core"
 )
@@ -21,6 +22,7 @@ type Engine interface {
 var (
 	x      *xorm.Engine
 	tables []interface{}
+	policy *bluemonday.Policy
 
 	DbCfg struct {
 		Type, Path string
@@ -29,6 +31,7 @@ var (
 
 func init() {
 	tables = append(tables, new(User), new(Mail), new(MailRecipient))
+	policy = bluemonday.UGCPolicy()
 }
 
 func LoadConfigs() {

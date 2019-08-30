@@ -15,23 +15,21 @@ function registerClipBoard() {
 
     const clipboard = new ClipboardJS('.clipboard');
     clipboard.on('success', function (e) {
+        const caller = $('#' + e.trigger.getAttribute('id'));
         e.clearSelection();
-        $('#' + e.trigger.getAttribute('id')).popup('destroy');
+        caller.popup('destroy');
         e.trigger.setAttribute('data-content', e.trigger.getAttribute('data-success'));
-        $('#' + e.trigger.getAttribute('id')).popup('show');
+        caller.popup('show');
         e.trigger.setAttribute('data-content', e.trigger.getAttribute('data-original'))
     });
 
     clipboard.on('error', function (e) {
-        $('#' + e.trigger.getAttribute('id')).popup('destroy');
+        const caller = $('#' + e.trigger.getAttribute('id'));
+        caller.popup('destroy');
         e.trigger.setAttribute('data-content', e.trigger.getAttribute('data-error'));
-        $('#' + e.trigger.getAttribute('id')).popup('show');
+        caller.popup('show');
         e.trigger.setAttribute('data-content', e.trigger.getAttribute('data-original'))
     });
-}
-
-function resizeIframe(obj) {
-    obj.style.height = obj.contentWindow.document.body.scrollHeight + 'px';
 }
 
 function registerInboxFeed() {
@@ -47,19 +45,8 @@ function refreshInboxFeed() {
     const xhr = new XMLHttpRequest();
     xhr.onreadystatechange = function () {
         if (xhr.readyState === 4 && xhr.status === 200) {
-            const newFeed = document.createElement('div');
-            newFeed.setAttribute("id", "newinboxfeed");
-            newFeed.style.visibility = 'hidden';
-            newFeed.innerHTML = xhr.responseText;
-            feed.parentElement.appendChild(newFeed);
-            document.addEventListener('DOMContentLoaded', (event) => {
-                const feed = document.getElementById("inboxfeed");
-                const newFeed = document.getElementById("newinboxfeed");
-                feed.parentElement.removeChild(feed);
-                newFeed.style.visibility = 'visible';
-                jdenticon();
-                newFeed.setAttribute("id", "inboxfeed");
-            });
+            feed.innerHTML = xhr.responseText;
+            jdenticon();
         }
     };
 

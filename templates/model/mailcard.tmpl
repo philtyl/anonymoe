@@ -10,8 +10,6 @@
         </div>
     </div>
     <div class="content very padded text">
-        <iframe srcdoc="{{Str2HTML .Body}}" onload="resizeIframe(this)" sandbox="allow-same-origin">
-            {{.TextBody}}
-        </iframe>
+        {{Str2HTML .Body}}
     </div>
 </div>
