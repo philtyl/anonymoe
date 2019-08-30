@@ -1,2 +1,4 @@
 # IntelliJ project files
 .idea
+/pkg/bindata/
+/public/css/anony.css
