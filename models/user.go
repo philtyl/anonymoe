@@ -44,7 +44,7 @@ func (u *User) getUserMail() (_ []*Mail, err error) {
 	sort.Slice(mailItems, func(i, j int) bool {
 		return mailItems[i].ReceivedUnix > mailItems[j].ReceivedUnix
 	})
-	return
+	return mailItems, err
 }
 
 func getUserByName(name string) (user *User, has bool, err error) {
