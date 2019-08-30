@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/go-xorm/xorm"
-	"github.com/jaytaylor/html2text"
+	"github.com/k3a/html2text"
 	"github.com/philtyl/anonymoe/pkg/setting"
 	"github.com/philtyl/parsemail"
 	log "gopkg.in/clog.v1"
@@ -44,22 +44,14 @@ func (m *Mail) AfterSet(colName string, _ xorm.Cell) {
 	case "sent":
 		m.SentUnix = m.Sent.Unix()
 	case "body":
-		var err error
-		m.TextBody, err = html2text.FromString(m.Body, html2text.Options{PrettyTables: true})
-		if err != nil {
-			log.Warn("Error creating textbody: %v", err)
-		}
+		m.TextBody = html2text.HTML2Text(m.Body)
 	}
 }
 
 func (m *Mail) AfterLoad() {
 	m.Received = time.Unix(m.ReceivedUnix, 0).Local()
 	m.Sent = time.Unix(m.SentUnix, 0).Local()
-	var err error
-	m.TextBody, err = html2text.FromString(m.Body, html2text.Options{PrettyTables: true})
-	if err != nil {
-		log.Warn("Error creating textbody: %v", err)
-	}
+	m.TextBody = html2text.HTML2Text(m.Body)
 }
 
 func createMail(e *xorm.Session, raw *RawMailItem) (_ *Mail, _ []MailRecipient, err error) {
