@@ -24,27 +24,26 @@ var Server = cli.Command{
 	Flags: []cli.Flag{
 		boolFlag("info", "Dump settings information for webserver"),
 		boolFlag("start", "Start webserver and necessary auxiliary components"),
+		stringFlag("level", "info", "Log level [trace|info|warn|error|fatal]"),
 	},
 }
 
 func StartServer(c *cli.Context) error {
-	SetupLogger("server.log")
+	SetupLogger("server.log", c.String("level"))
 
 	if err := setting.NewContext(); err != nil {
 		log.Fatal(2, "Unable to initialize settings context: %v", err)
 	}
 	if err := models.SetEngine(); err != nil {
-		log.Fatal(2, "Internal error: SetEngine: %v", err)
+		log.Fatal(2, "Unable to initialize models engine: %v", err)
 	}
 
 	if c.Bool("start") {
 		go mail.NewSMTPServer()
 		return runWeb(c)
 	} else if c.Bool("info") {
-		if err := setting.NewContext(); err != nil {
-			log.Fatal(2, "Unable to initialize settings context: %v", err)
-		}
-
+		log.Info("Application Properties:\n%s", setting.Info())
+		fmt.Printf("Application Properties:\n%s", setting.Info())
 	}
 	return nil
 }
@@ -58,8 +57,8 @@ func runWeb(c *cli.Context) error {
 	m.Get("/inbox/:user/node", routes.InboxNode)
 	m.NotFound(routes.Home)
 
-	listenAddr := fmt.Sprintf("%s:%s", setting.HTTPAddr, setting.HTTPPort)
-	log.Info("Listen: %v://%s%s", setting.Protocol, listenAddr, setting.AppURL)
+	listenAddr := fmt.Sprintf("%s:%s", setting.Config.HTTPAddr, setting.Config.HTTPPort)
+	log.Info("Listen: %v://%s%s", setting.Config.Protocol, listenAddr, setting.Config.AppURL)
 
 	var err error
 	server := &http.Server{Addr: listenAddr, Handler: m}
@@ -76,12 +75,12 @@ func newMacaron() *macaron.Macaron {
 	m := macaron.New()
 	m.Use(macaron.Logger())
 	m.Use(macaron.Static(
-		path.Join(setting.StaticRootPath, "public"),
+		path.Join(setting.Config.StaticRootPath, "public"),
 	))
 
 	funcMap := template.NewFuncMap()
 	m.Use(macaron.Renderer(macaron.RenderOptions{
-		Directory:  path.Join(setting.StaticRootPath, "templates"),
+		Directory:  path.Join(setting.Config.StaticRootPath, "templates"),
 		Funcs:      funcMap,
 		IndentJSON: macaron.Env != macaron.PROD,
 	}))

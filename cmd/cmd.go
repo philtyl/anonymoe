@@ -2,17 +2,23 @@ package cmd
 
 import (
 	"path/filepath"
+	"strings"
 
 	"github.com/philtyl/anonymoe/pkg/setting"
 	"github.com/urfave/cli"
 	log "gopkg.in/clog.v1"
 )
 
-func SetupLogger(logName string) {
-	level := log.TRACE
-	if setting.ProdMode {
-		level = log.ERROR
-	}
+var levels = map[string]log.LEVEL{
+	"trace": log.TRACE,
+	"info":  log.INFO,
+	"warn":  log.WARN,
+	"error": log.ERROR,
+	"fatal": log.FATAL,
+}
+
+func SetupLogger(logName, slevel string) {
+	level := levels[strings.ToLower(slevel)]
 	err := log.New(log.FILE, log.FileConfig{
 		Level:    level,
 		Filename: filepath.Join(setting.InstallDir(), "logs", logName),

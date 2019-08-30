@@ -35,8 +35,8 @@ func init() {
 }
 
 func LoadConfigs() {
-	DbCfg.Type = setting.DatabaseType
-	DbCfg.Path = setting.DatabasePath
+	DbCfg.Type = setting.Config.DatabaseType
+	DbCfg.Path = setting.Config.DatabasePath
 }
 
 func getEngine() (*xorm.Engine, error) {

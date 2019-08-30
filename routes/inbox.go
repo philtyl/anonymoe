@@ -16,7 +16,7 @@ const (
 )
 
 func NewInbox(c *context.Context) {
-	c.Redirect(setting.AppURL + "/inbox/" + strings.ToLower(randomdata.SillyName()))
+	c.Redirect(setting.Config.AppURL + "/inbox/" + strings.ToLower(randomdata.SillyName()))
 }
 
 func Inbox(c *context.Context) {
@@ -33,7 +33,7 @@ func InboxContents(c *context.Context) {
 	username := strings.ToLower(c.Params(":user"))
 	c.Data["User"] = username
 
-	if setting.ProdMode && setting.IsPrivateAccount(username) {
+	if setting.Config.ProdMode && setting.IsPrivateAccount(username) {
 		c.Data["Private"] = true
 	} else {
 		mail, err := models.GetMail(username)

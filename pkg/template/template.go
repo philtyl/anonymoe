@@ -15,16 +15,16 @@ import (
 func NewFuncMap() []template.FuncMap {
 	return []template.FuncMap{map[string]interface{}{
 		"AppName": func() string {
-			return setting.AppName
+			return setting.Config.AppName
 		},
 		"AppURL": func() string {
-			return setting.AppURL
+			return setting.Config.AppURL
 		},
 		"AppVer": func() string {
-			return setting.AppVer
+			return setting.Config.AppVer
 		},
 		"AppDomain": func() string {
-			return setting.AppDomain
+			return setting.Config.AppDomain
 		},
 		"LoadTimes": func(startTime time.Time) string {
 			return fmt.Sprint(time.Since(startTime).Nanoseconds()/1e6) + "ms"

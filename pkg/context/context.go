@@ -16,12 +16,6 @@ type Context struct {
 	*macaron.Context
 	Flash   *session.Flash
 	Session session.Store
-
-	User string
-}
-
-func (c *Context) IsLogged() bool {
-	return c.User != ""
 }
 
 // HTML responses template with given status.
@@ -114,7 +108,7 @@ func Contexter() macaron.Handler {
 			Flash:   f,
 			Session: sess,
 		}
-		log.Info("Session ID: %s", sess.ID())
+		log.Trace("Session ID: %s", sess.ID())
 		ctx.Map(c)
 	}
 }

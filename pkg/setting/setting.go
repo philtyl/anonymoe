@@ -1,6 +1,8 @@
 package setting
 
 import (
+	"encoding/json"
+	"fmt"
 	"os"
 	"os/exec"
 	"path"
@@ -15,35 +17,39 @@ import (
 )
 
 var (
-	// App settings
-	AppName   string
-	AppVer    string
-	AppURL    string
-	AppDomain string
-	AppPath   string
-	ProdMode  bool
-
-	// Server settings
-	StaticRootPath string
-	HTTPAddr       string
-	HTTPPort       string
-	Protocol       string
-
-	// Database settings
-	DatabaseType string
-	DatabasePath string
-
-	// Global setting objects
-	Cfg         *ini.File
-	CfgFilePath string
+	Config Properties
+	cfg    *ini.File
 
 	// Session settings
 	SessionConfig session.Options
+)
+
+type Properties struct {
+	// App settings
+	AppName   string `json:"app_name"`
+	AppVer    string `json:"app_ver"`
+	AppURL    string `json:"app_url"`
+	AppDomain string `json:"app_domain"`
+	AppPath   string `json:"app_path"`
+	ProdMode  bool   `json:"prod_mode"`
+
+	// Server settings
+	StaticRootPath string `json:"static_root_path"`
+	HTTPAddr       string `json:"http_addr"`
+	HTTPPort       string `json:"http_port"`
+	Protocol       string `json:"protocol"`
+
+	// Database settings
+	DatabaseType string `json:"database_type"`
+	DatabasePath string `json:"database_path"`
+
+	// Global setting objects
+	CfgFilePath string `json:"cfg_file_path"`
 
 	// Mail settings
-	MailPort        string
-	PrivateAccounts []string
-)
+	MailPort        string   `json:"mail_port"`
+	PrivateAccounts []string `json:"private_accounts"`
+}
 
 // execPath returns the executable path.
 func execPath() (string, error) {
@@ -55,20 +61,20 @@ func execPath() (string, error) {
 }
 
 func init() {
-	AppVer = string(bindata.MustAsset("conf/VERSION"))
+	Config.AppVer = string(bindata.MustAsset("conf/VERSION"))
 	var err error
-	if AppPath, err = execPath(); err != nil {
-		log.Fatal(2, "Fail to get app path: %v\n", err)
+	if Config.AppPath, err = execPath(); err != nil {
+		log.Fatal(2, "Fail to resolve [AppPath]: %v\n", err)
 	}
-	AppPath = strings.Replace(AppPath, "\\", "/", -1)
+	Config.AppPath = strings.Replace(Config.AppPath, "\\", "/", -1)
 }
 
 func WorkDir() string {
-	i := strings.LastIndex(AppPath, "/")
+	i := strings.LastIndex(Config.AppPath, "/")
 	if i == -1 {
-		return AppPath
+		return Config.AppPath
 	}
-	return AppPath[:i]
+	return Config.AppPath[:i]
 }
 
 func InstallDir() (dir string) {
@@ -81,49 +87,58 @@ func InstallDir() (dir string) {
 
 func NewContext() (err error) {
 	InstallPath := InstallDir()
-	CfgFilePath = path.Join(InstallPath, "app.ini")
-	Cfg, err = ini.LoadSources(ini.LoadOptions{
+	Config.CfgFilePath = path.Join(InstallPath, "app.ini")
+	cfg, err = ini.LoadSources(ini.LoadOptions{
 		IgnoreInlineComment: true,
-	}, CfgFilePath)
+	}, bindata.MustAsset("conf/app.ini"))
 	if err != nil {
-		log.Fatal(2, "Fail to parse 'app.ini': %v", err)
+		log.Fatal(2, "Fail to parse default config file [conf/app.ini]: %v", err)
 	}
 
-	if com.IsFile(CfgFilePath) {
-		if err = Cfg.Append(CfgFilePath); err != nil {
-			log.Fatal(2, "Fail to load custom config '%s': %v", CfgFilePath, err)
+	if com.IsFile(Config.CfgFilePath) {
+		if err = cfg.Append(Config.CfgFilePath); err != nil {
+			log.Fatal(2, "Fail to load custom config [%s]: %v", Config.CfgFilePath, err)
 		}
 	} else {
-		log.Fatal(2, "Install config '%s' not found, please install server", CfgFilePath)
+		log.Fatal(0, "Install config [%s] not found, please install server", Config.CfgFilePath)
 	}
-	Cfg.NameMapper = ini.AllCapsUnderscore
+	cfg.NameMapper = ini.AllCapsUnderscore
 
-	AppName = Cfg.Section("").Key("APP_NAME").MustString("Anonymoe")
-	ProdMode = Cfg.Section("").Key("PRODUCTION_MODE").MustBool(true)
+	Config.AppName = cfg.Section("").Key("APP_NAME").MustString("Anonymoe")
+	Config.ProdMode = cfg.Section("").Key("PRODUCTION_MODE").MustBool(true)
 
-	serverSec := Cfg.Section("server")
-	AppURL = serverSec.Key("ROOT_URL").MustString("http://localhost:3000")
-	Protocol = serverSec.Key("PROTOCOL").String()
-	AppDomain = serverSec.Key("DOMAIN").MustString("localhost")
-	HTTPAddr = serverSec.Key("HTTP_ADDR").MustString("0.0.0.0")
-	HTTPPort = serverSec.Key("HTTP_PORT").MustString("3000")
+	serverSec := cfg.Section("server")
+	Config.AppURL = serverSec.Key("ROOT_URL").MustString("http://localhost:3000")
+	Config.Protocol = serverSec.Key("PROTOCOL").String()
+	Config.AppDomain = serverSec.Key("DOMAIN").MustString("localhost")
+	Config.HTTPAddr = serverSec.Key("HTTP_ADDR").MustString("0.0.0.0")
+	Config.HTTPPort = serverSec.Key("HTTP_PORT").MustString("3000")
 
-	dbSec := Cfg.Section("database")
-	DatabaseType = dbSec.Key("TYPE").MustString("sqlite3")
-	DatabasePath = path.Join(InstallPath, dbSec.Key("PATH").MustString("anonymail.db"))
+	dbSec := cfg.Section("database")
+	Config.DatabaseType = dbSec.Key("TYPE").MustString("sqlite3")
+	Config.DatabasePath = path.Join(InstallPath, dbSec.Key("PATH").MustString("anonymail.db"))
 
-	mailSec := Cfg.Section("mail")
-	MailPort = mailSec.Key("PORT").MustString("1025")
-	PrivateAccounts = strings.Split(mailSec.Key("PRIVATE_ACCOUNTS").MustString("hostmaster"), ",")
+	mailSec := cfg.Section("mail")
+	Config.MailPort = mailSec.Key("PORT").MustString("1025")
+	Config.PrivateAccounts = strings.Split(mailSec.Key("PRIVATE_ACCOUNTS").MustString("hostmaster"), ",")
 
 	return err
 }
 
 func IsPrivateAccount(account string) bool {
-	for _, a := range PrivateAccounts {
+	for _, a := range Config.PrivateAccounts {
 		if account == a {
 			return true
 		}
 	}
 	return false
+}
+
+func Info() string {
+	prettyJSON, err := json.MarshalIndent(Config, "", "    ")
+	if err != nil {
+		log.Warn("Failed to generate json: %v", err)
+		return fmt.Sprintf("Failed to generate json: %v", err)
+	}
+	return fmt.Sprintf("%s\n", string(prettyJSON))
 }

@@ -50,19 +50,22 @@ func (m *Mail) AfterLoad() {
 }
 
 func createMail(e *xorm.Session, raw *RawMailItem) (_ *Mail, _ []MailRecipient, err error) {
-	log.Trace("Raw Mail Item:\n%+v\n", raw)
+	log.Trace("Received new mail item: %v", raw)
 	r := strings.NewReader(raw.Data)
 	m, err := parsemail.Parse(r)
 	if err != nil {
-		log.Warn("Unable to parse raw email data: %v", err)
+		log.Warn("Unable to parse raw email data, ignoring: %v", err)
 		return
 	}
 
 	body := m.HTMLBody
 	if len(body) == 0 {
-		bytesBody, err := ioutil.ReadAll(quotedprintable.NewReader(strings.NewReader(m.TextBody)))
+		log.Trace("HTMLBody is empty, falling back to TextBody")
+		var bytesBody []byte
+		bytesBody, err = ioutil.ReadAll(quotedprintable.NewReader(strings.NewReader(m.TextBody)))
 		if err != nil {
-			log.Warn("Unable to parse text message")
+			log.Warn("Both HTMLBody and TextBody are not able to be parsed, ignoring: %v", err)
+			return
 		}
 		body = string(bytesBody)
 	}
@@ -74,32 +77,38 @@ func createMail(e *xorm.Session, raw *RawMailItem) (_ *Mail, _ []MailRecipient, 
 		Body:    policy.Sanitize(body),
 	}
 	if _, err = e.Insert(mailItem); err != nil {
-		return nil, nil, err
+		log.Warn("Unable to insert Mail item into database: %v", err)
+		return
 	}
+	log.Info("Created Mail: [ID:%d, From:<%s>, Subject:\"%s\"]", mailItem.Id, mailItem.From, mailItem.Subject)
 
 	var recipients []MailRecipient
 	for _, recipient := range raw.Recipient {
-		if strings.HasSuffix(recipient, "@"+setting.AppDomain) {
-			user, err := GetOrCreateUserByName(e, recipient)
-			if err != nil {
-				return nil, nil, err
+		if strings.HasSuffix(recipient, "@"+setting.Config.AppDomain) {
+			var user *User
+			user, err = GetOrCreateUserByName(e, recipient)
+			if err != nil || user == nil {
+				log.Warn("Unable to create or retrieve user <%s>: %v", recipient, err)
+				return
 			}
-			if user != nil {
-				mailRecipient := &MailRecipient{
-					MailId:      mailItem.Id,
-					RecipientId: user.Id,
-				}
-				if _, err = e.Insert(mailRecipient); err != nil {
-					return nil, nil, err
-				}
-				recipients = append(recipients, *mailRecipient)
+
+			mailRecipient := &MailRecipient{
+				MailId:      mailItem.Id,
+				RecipientId: user.Id,
 			}
+			if _, err = e.Insert(mailRecipient); err != nil {
+				log.Warn("Unable to link [Mail:%d] to [User:%d]: %v", mailItem.Id, user.Id, err)
+				return
+			}
+			log.Info("Created Mail Recipient: [ID:%d, MailID:%d, UserID:%d, User:%s]",
+				mailRecipient.Id, mailRecipient.MailId, mailRecipient.RecipientId, user.Name)
+			recipients = append(recipients, *mailRecipient)
 		} else {
-			log.Info("Receiving mail for outside address: %s, skipping linkage...", recipient)
+			log.Warn("Receiving mail for outside address: <%s>, skipping linkage...", recipient)
 		}
 	}
 
-	return mailItem, recipients, nil
+	return mailItem, recipients, err
 }
 
 func CreateMail(raw *RawMailItem) (mail *Mail, recipients []MailRecipient, err error) {

@@ -18,13 +18,13 @@ var Install = cli.Command{
 	Flags: []cli.Flag{
 		boolFlag("init, i", "Initial database/config install"),
 		boolFlag("migrate, m", "Migrate existing database"),
-
 		boolFlag("force", "Force initial database/config install despite existing files"),
+		stringFlag("level", "error", "Log level [trace|info|warn|error|fatal]"),
 	},
 }
 
 func InstallServer(c *cli.Context) (err error) {
-	SetupLogger("install.log")
+	SetupLogger("install.log", c.String("level"))
 
 	if c.Bool("init") {
 		installPath := setting.InstallDir()

@@ -56,7 +56,7 @@ func (s *Session) Reset() {
 		if err == nil {
 			log.Info("Mail Received: %+v\nSent to: %+v", mail, recipients)
 		} else {
-			log.Info("Error Finalizing Mail Item: %v", err)
+			log.Error(2, "Error Finalizing Mail Item: %v", err)
 		}
 	}
 	s.Item = new(models.RawMailItem)
@@ -70,8 +70,8 @@ func NewSMTPServer() {
 	be := &Backend{}
 
 	s := smtp.NewServer(be)
-	s.Addr = ":" + setting.MailPort
-	s.Domain = setting.AppDomain
+	s.Addr = ":" + setting.Config.MailPort
+	s.Domain = setting.Config.AppDomain
 	s.ReadTimeout = 10 * time.Second
 	s.WriteTimeout = 10 * time.Second
 	s.MaxMessageBytes = 1024 * 1024
