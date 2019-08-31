@@ -87,9 +87,9 @@ func (c *Cleaner) clean(s string) string {
 		for regex.MatchString(s) {
 			s = regex.ReplaceAllString(s, fmt.Sprintf("<MATCHED%s$1</MATCHED%s>", search, search))
 		}
-		openTags := regexp.MustCompile(fmt.Sprintf(`(?m)<%s[\S\s]*>`, search))
-		closeTags := regexp.MustCompile(fmt.Sprintf(`(?m)<\%s>`, search))
-		undoMatcheTags := regexp.MustCompile(fmt.Sprintf(`(?m)<MATCHED%s([\S\s]*)</MATCHED%s>`, search))
+		openTags := regexp.MustCompile(fmt.Sprintf(`<%s[\S\s]*>`, search))
+		closeTags := regexp.MustCompile(fmt.Sprintf(`<\%s>`, search))
+		undoMatcheTags := regexp.MustCompile(fmt.Sprintf(`<MATCHED%s([\S\s]*)</MATCHED%s>`, search))
 		s = openTags.ReplaceAllString(s, "")
 		s = closeTags.ReplaceAllString(s, "")
 		for undoMatcheTags.MatchString(s) {
