@@ -88,7 +88,7 @@ func createMail(e *xorm.Session, raw *RawMailItem) (_ *Mail, _ []MailRecipient, 
 		strings.ReplaceAll(body, "<img src=\"cid:", fmt.Sprintf("<img src=\"%s/inbox/embed/%d/", setting.Config.AppURL, mailItem.Id))
 	}
 
-	log.Trace("Updating body for Mail item [ID:%d]", mailItem.Id)
+	log.Trace("Updating body for Mail item [ID:%d]:\n%s", mailItem.Id, body)
 	mailItem.Body = policy.Sanitize(body)
 	if _, err = e.Update(mailItem); err != nil {
 		log.Warn("Unable to update body on Mail [ID:%d]", mailItem.Id)
