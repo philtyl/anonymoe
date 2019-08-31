@@ -53,7 +53,7 @@ func InboxEmbeddedFile(c *context.Context) {
 	mailId, err := strconv.ParseInt(c.Params(":mid"), 10, 64)
 	if err == nil {
 		embeddedFile, has, err := models.GetEmbeddedFile(mailId, contentId)
-		if has && err != nil && embeddedFile != nil {
+		if has && err == nil && embeddedFile != nil {
 			log.Trace("Serving file [ID:%d, MailID:%d, ContentID:%s]", embeddedFile.Id, embeddedFile.MailId, embeddedFile.ContentId)
 			c.ServeEmbeddedContent(embeddedFile.ContentId, embeddedFile.ContentType, strings.NewReader(embeddedFile.Data))
 			return
