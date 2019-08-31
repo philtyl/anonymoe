@@ -10,6 +10,7 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/microcosm-cc/bluemonday"
 	"github.com/philtyl/anonymoe/pkg/setting"
+	log "gopkg.in/clog.v1"
 	"xorm.io/core"
 )
 
@@ -85,6 +86,7 @@ type Cleaner struct {
 func (c *Cleaner) clean(s string) string {
 	for search, regex := range c.tags {
 		for regex.MatchString(s) {
+			log.Trace("Cleaner match: %s", regex.FindString(s))
 			s = regex.ReplaceAllString(s, fmt.Sprintf("<MATCHED%s$1</MATCHED%s>", search, search))
 		}
 		openTags := regexp.MustCompile(fmt.Sprintf(`(?s)<%s.*>`, search))
