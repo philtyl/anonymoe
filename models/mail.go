@@ -85,7 +85,7 @@ func createMail(e *xorm.Session, raw *RawMailItem) (_ *Mail, _ []MailRecipient, 
 		}
 		body = string(bytesBody)
 	} else {
-		strings.ReplaceAll(body, "<img src=\"cid:", fmt.Sprintf("<img src=\"%s/inbox/embed/%d/", setting.Config.AppURL, mailItem.Id))
+		body = strings.ReplaceAll(body, "<img src=\"cid:", fmt.Sprintf("<img src=\"%s/inbox/embed/%d/", setting.Config.AppURL, mailItem.Id))
 	}
 
 	log.Trace("Updating body for Mail item [ID:%d]:\n%s", mailItem.Id, body)
