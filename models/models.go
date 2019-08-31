@@ -32,6 +32,7 @@ var (
 func init() {
 	tables = append(tables, new(Attachment), new(EmbeddedFile), new(Mail), new(MailRecipient), new(User))
 	policy = bluemonday.UGCPolicy()
+	policy.AllowAttrs("src").OnElements("img")
 }
 
 func LoadConfigs() {
