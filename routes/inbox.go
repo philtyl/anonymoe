@@ -49,15 +49,18 @@ func InboxContents(c *context.Context) {
 }
 
 func InboxEmbeddedFile(c *context.Context) {
+	contentId := c.Params(":cid")
 	mailId, err := strconv.ParseInt(c.Params(":mid"), 10, 64)
 	if err == nil {
-		contentId := c.Params(":cid")
 		embeddedFile, has, err := models.GetEmbeddedFile(mailId, contentId)
 		if has && err != nil && embeddedFile != nil {
+			log.Trace("Serving file [ID:%d, MailID:%d, ContentID:%s]", embeddedFile.Id, embeddedFile.MailId, embeddedFile.ContentId)
 			c.ServeEmbeddedContent(embeddedFile.ContentId, embeddedFile.ContentType, strings.NewReader(embeddedFile.Data))
 			return
 		}
+		log.Warn("Unable to serve file [MailID:%d, ContentID:%s, Has:%b, File:%v]: %v", mailId, contentId, has, embeddedFile, err)
 	}
+	log.Warn("Unable to load embedded file [MailID:%d, ContentID:%s]: %v", mailId, contentId, err)
 	c.NotFound()
 }
 
