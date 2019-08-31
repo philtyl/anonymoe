@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"path"
+	"regexp"
 
 	"github.com/go-xorm/xorm"
 	_ "github.com/mattn/go-sqlite3"
@@ -20,9 +21,10 @@ type Engine interface {
 }
 
 var (
-	x      *xorm.Engine
-	tables []interface{}
-	policy *bluemonday.Policy
+	x       *xorm.Engine
+	tables  []interface{}
+	policy  *bluemonday.Policy
+	cleaner *Cleaner
 
 	DbCfg struct {
 		Type, Path string
@@ -32,6 +34,11 @@ var (
 func init() {
 	tables = append(tables, new(Attachment), new(EmbeddedFile), new(Mail), new(MailRecipient), new(User))
 	policy = bluemonday.UGCPolicy()
+	cleaner = &Cleaner{
+		tags: map[string]*regexp.Regexp{
+			"div": regexp.MustCompile(`(?m)<div([\S\s]*)</div>`),
+		},
+	}
 }
 
 func LoadConfigs() {
@@ -69,4 +76,25 @@ func NewEngine() (err error) {
 	}
 
 	return nil
+}
+
+type Cleaner struct {
+	tags map[string]*regexp.Regexp
+}
+
+func (c *Cleaner) clean(s string) string {
+	for search, regex := range c.tags {
+		for regex.MatchString(s) {
+			s = regex.ReplaceAllString(s, fmt.Sprintf("<MATCHED%s$1</MATCHED%s>", search, search))
+		}
+		openTags := regexp.MustCompile(fmt.Sprintf(`(?m)<%s[\S\s]*>`, search))
+		closeTags := regexp.MustCompile(fmt.Sprintf(`(?m)<\%s>`, search))
+		undoMatcheTags := regexp.MustCompile(fmt.Sprintf(`(?m)<MATCHED%s([\S\s]*)</MATCHED%s>`, search))
+		s = openTags.ReplaceAllString(s, "")
+		s = closeTags.ReplaceAllString(s, "")
+		for undoMatcheTags.MatchString(s) {
+			s = undoMatcheTags.ReplaceAllString(s, fmt.Sprintf("<%s$1</%s>", search, search))
+		}
+	}
+	return s
 }
