@@ -30,7 +30,7 @@ var (
 )
 
 func init() {
-	tables = append(tables, new(User), new(Mail), new(MailRecipient))
+	tables = append(tables, new(Attachment), new(EmbeddedFile), new(Mail), new(MailRecipient), new(User))
 	policy = bluemonday.UGCPolicy()
 }
 

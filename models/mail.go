@@ -1,6 +1,7 @@
 package models
 
 import (
+	"fmt"
 	"io/ioutil"
 	"mime/quotedprintable"
 	"strings"
@@ -18,6 +19,10 @@ type MailRecipient struct {
 	RecipientId int64 `xorm:"INDEX"`
 }
 
+func (m *MailRecipient) String() string {
+	return fmt.Sprintf("[ID:%d, MailID:%d, UserID:%d]", m.Id, m.MailId, m.RecipientId)
+}
+
 type Mail struct {
 	Id      int64
 	From    string
@@ -28,13 +33,6 @@ type Mail struct {
 	ReceivedUnix int64     `xorm:"created"`
 	Sent         time.Time
 	SentUnix     int64
-}
-
-type RawMailItem struct {
-	From      string
-	Recipient []string
-	Data      string
-	Complete  bool
 }
 
 func (m *Mail) AfterSet(colName string, _ xorm.Cell) {
@@ -49,6 +47,13 @@ func (m *Mail) AfterLoad() {
 	m.Sent = time.Unix(m.SentUnix, 0).Local()
 }
 
+type RawMailItem struct {
+	From      string
+	Recipient []string
+	Data      string
+	Complete  bool
+}
+
 func createMail(e *xorm.Session, raw *RawMailItem) (_ *Mail, _ []MailRecipient, err error) {
 	log.Trace("Received new mail item: %v", raw)
 	r := strings.NewReader(raw.Data)
@@ -57,6 +62,17 @@ func createMail(e *xorm.Session, raw *RawMailItem) (_ *Mail, _ []MailRecipient, 
 		log.Warn("Unable to parse raw email data, ignoring: %v", err)
 		return
 	}
+
+	mailItem := &Mail{
+		From:    raw.From,
+		Sent:    m.Date,
+		Subject: m.Subject,
+	}
+	if _, err = e.Insert(mailItem); err != nil {
+		log.Warn("Unable to insert Mail item into database: %v", err)
+		return
+	}
+	log.Info("Created Mail: [ID:%d, From:<%s>, Subject:\"%s\"]", mailItem.Id, mailItem.From, mailItem.Subject)
 
 	body := m.HTMLBody
 	if len(body) == 0 {
@@ -68,19 +84,16 @@ func createMail(e *xorm.Session, raw *RawMailItem) (_ *Mail, _ []MailRecipient, 
 			return
 		}
 		body = string(bytesBody)
+	} else {
+		strings.ReplaceAll(body, "<img src=\"cid:", fmt.Sprintf("<img src=\"%s/inbox/embed/%d/", setting.Config.AppURL, mailItem.Id))
 	}
 
-	mailItem := &Mail{
-		From:    raw.From,
-		Sent:    m.Date,
-		Subject: m.Subject,
-		Body:    policy.Sanitize(body),
-	}
-	if _, err = e.Insert(mailItem); err != nil {
-		log.Warn("Unable to insert Mail item into database: %v", err)
+	log.Trace("Updating body for Mail item [ID:%d]", mailItem.Id)
+	mailItem.Body = policy.Sanitize(body)
+	if _, err = e.Update(mailItem); err != nil {
+		log.Warn("Unable to update body on Mail [ID:%d]", mailItem.Id)
 		return
 	}
-	log.Info("Created Mail: [ID:%d, From:<%s>, Subject:\"%s\"]", mailItem.Id, mailItem.From, mailItem.Subject)
 
 	var recipients []MailRecipient
 	for _, recipient := range raw.Recipient {
@@ -107,6 +120,39 @@ func createMail(e *xorm.Session, raw *RawMailItem) (_ *Mail, _ []MailRecipient, 
 			log.Warn("Receiving mail for outside address: <%s>, skipping linkage...", recipient)
 		}
 	}
+	if len(recipients) == 0 {
+		return nil, nil, fmt.Errorf("No valid recepients, nothing to do.  [Recipients:%v]", raw.Recipient)
+	}
+
+	for _, rawAttachment := range m.Attachments {
+		data, _ := ioutil.ReadAll(rawAttachment.Data)
+		attachment := &Attachment{
+			MailId:      mailItem.Id,
+			FileName:    rawAttachment.Filename,
+			ContentType: rawAttachment.ContentType,
+			Data:        string(data),
+		}
+		log.Trace("Creating Attachment [MailID:%d, FileName:%s]", attachment.MailId, attachment.FileName)
+		attachment, warning := CreateAttachment(e, attachment)
+		if warning != nil {
+			log.Warn("Unable to insert Attachment (%s) into database: %v", rawAttachment.Filename, warning)
+		}
+	}
+
+	for _, rawEmbeddedFile := range m.EmbeddedFiles {
+		data, _ := ioutil.ReadAll(rawEmbeddedFile.Data)
+		embeddedFile := &EmbeddedFile{
+			MailId:      mailItem.Id,
+			ContentId:   rawEmbeddedFile.CID,
+			ContentType: rawEmbeddedFile.ContentType,
+			Data:        string(data),
+		}
+		log.Trace("Creating EmbeddedFile [MailID:%d, ContentID:%s]", embeddedFile.MailId, embeddedFile.ContentId)
+		embeddedFile, warning := CreateEmbeddedFile(e, embeddedFile)
+		if warning != nil {
+			log.Warn("Unable to insert EmbeddedFile [MailID:%d, ContentID:%s] into database: %v", mailItem.Id, rawEmbeddedFile.CID, warning)
+		}
+	}
 
 	return mailItem, recipients, err
 }
@@ -120,12 +166,9 @@ func CreateMail(raw *RawMailItem) (mail *Mail, recipients []MailRecipient, err e
 
 	mail, recipients, err = createMail(sess, raw)
 	if err != nil {
+		defer sess.Rollback()
 		return nil, nil, err
 	}
 
 	return mail, recipients, sess.Commit()
-}
-
-func getUserMailCount(u *User) (int64, error) {
-	return x.Count(&MailRecipient{RecipientId: u.Id})
 }

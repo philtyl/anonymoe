@@ -17,6 +17,10 @@ type User struct {
 	CreatedUnix int64     `xorm:"created"`
 }
 
+func getUserMailCount(u *User) (int64, error) {
+	return x.Count(&MailRecipient{RecipientId: u.Id})
+}
+
 func (u *User) getUserMail() (_ []*Mail, err error) {
 	log.Trace("Loading mail items for <%s>", u.Name)
 	count, err := getUserMailCount(u)

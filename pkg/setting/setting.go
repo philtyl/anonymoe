@@ -122,7 +122,7 @@ func NewContext() (err error) {
 	Config.MailPort = mailSec.Key("PORT").MustString("1025")
 	Config.PrivateAccounts = strings.Split(mailSec.Key("PRIVATE_ACCOUNTS").MustString("hostmaster"), ",")
 
-	return err
+	return
 }
 
 func IsPrivateAccount(account string) bool {

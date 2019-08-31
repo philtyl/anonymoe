@@ -54,7 +54,7 @@ func (s *Session) Reset() {
 	if s.Item.Complete {
 		mail, recipients, err := models.CreateMail(s.Item)
 		if err == nil {
-			log.Info("Mail Received: %+v\nSent to: %+v", mail, recipients)
+			log.Trace("Mail Received: %+v\nSent to: %v", mail, recipients)
 		} else {
 			log.Error(2, "Error Finalizing Mail Item: %v", err)
 		}

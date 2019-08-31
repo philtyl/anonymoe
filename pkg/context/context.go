@@ -82,22 +82,10 @@ func (c *Context) HandleText(status int, title string) {
 	c.PlainText(status, []byte(title))
 }
 
-func (c *Context) ServeContent(name string, r io.ReadSeeker, params ...interface{}) {
-	modtime := time.Now()
-	for _, p := range params {
-		switch v := p.(type) {
-		case time.Time:
-			modtime = v
-		}
-	}
-	c.Resp.Header().Set("Content-Description", "File Transfer")
-	c.Resp.Header().Set("Content-Type", "application/octet-stream")
-	c.Resp.Header().Set("Content-Disposition", "attachment; filename="+name)
-	c.Resp.Header().Set("Content-Transfer-Encoding", "binary")
+func (c *Context) ServeEmbeddedContent(name string, contentType string, r io.ReadSeeker) {
+	c.Resp.Header().Set("Content-Type", contentType)
 	c.Resp.Header().Set("Expires", "0")
-	c.Resp.Header().Set("Cache-Control", "must-revalidate")
-	c.Resp.Header().Set("Pragma", "public")
-	http.ServeContent(c.Resp, c.Req.Request, name, modtime, r)
+	http.ServeContent(c.Resp, c.Req.Request, name, time.Now(), r)
 }
 
 // Contexter initializes a classic context for a request.
