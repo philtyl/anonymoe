@@ -35,6 +35,10 @@ type Mail struct {
 	SentUnix     int64
 }
 
+func (m *Mail) String() string {
+	return fmt.Sprintf("[ID:%d, From:%s, Subject:%s]", m.Id, m.From, m.Subject)
+}
+
 func (m *Mail) AfterSet(colName string, _ xorm.Cell) {
 	switch colName {
 	case "sent":
