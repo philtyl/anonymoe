@@ -36,7 +36,7 @@ func init() {
 	policy = bluemonday.UGCPolicy()
 	cleaner = &Cleaner{
 		tags: map[string]*regexp.Regexp{
-			"div": regexp.MustCompile(`(?m)<div([\S\s]*)</div>`),
+			"div": regexp.MustCompile(`(?s)<div(.*)</div>`),
 		},
 	}
 }
@@ -87,9 +87,9 @@ func (c *Cleaner) clean(s string) string {
 		for regex.MatchString(s) {
 			s = regex.ReplaceAllString(s, fmt.Sprintf("<MATCHED%s$1</MATCHED%s>", search, search))
 		}
-		openTags := regexp.MustCompile(fmt.Sprintf(`<%s[\S\s]*>`, search))
+		openTags := regexp.MustCompile(fmt.Sprintf(`(?s)<%s.*>`, search))
 		closeTags := regexp.MustCompile(fmt.Sprintf(`<\%s>`, search))
-		undoMatcheTags := regexp.MustCompile(fmt.Sprintf(`<MATCHED%s([\S\s]*)</MATCHED%s>`, search))
+		undoMatcheTags := regexp.MustCompile(fmt.Sprintf(`(?s)<MATCHED%s(.*)</MATCHED%s>`, search))
 		s = openTags.ReplaceAllString(s, "")
 		s = closeTags.ReplaceAllString(s, "")
 		for undoMatcheTags.MatchString(s) {

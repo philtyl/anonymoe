@@ -93,7 +93,7 @@ func createMail(e *xorm.Session, raw *RawMailItem) (_ *Mail, _ []MailRecipient, 
 	}
 
 	log.Trace("Original body for Mail item [ID:%d]:\n%s", mailItem.Id, body)
-	mailItem.Body = cleaner.clean(policy.Sanitize(strings.ReplaceAll(body, "\n", "")))
+	mailItem.Body = cleaner.clean(policy.Sanitize(body))
 	log.Trace("Updating body for Mail item [ID:%d]:\n%s", mailItem.Id, body)
 	if _, err = e.ID(mailItem.Id).Update(mailItem); err != nil {
 		log.Warn("Unable to update body on Mail [ID:%d]", mailItem.Id)
