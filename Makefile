@@ -31,7 +31,7 @@ uglifycss: public/css/anony.min.css
 public/css/anony.min.css: public/css/anony.css
 	@type uglifycss >/dev/null 2>&1 && uglifycss $< >$@ || echo "uglifycss command not found, skipped."
 
-uglifyjs: public/js/anony.min.js public/js/serviceworker.min.js
+uglifyjs: public/js/anony.min.js public/serviceworker.min.js
 
 public/js/anony.min.js: public/js/anony.js
 	@type terser >/dev/null 2>&1 && terser --compress --mangle -- $< >$@ || echo "terser  command not found, skipped."
