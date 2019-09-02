@@ -36,7 +36,7 @@ uglifyjs: public/js/anony.min.js public/js/serviceworker.min.js
 public/js/anony.min.js: public/js/anony.js
 	@type terser >/dev/null 2>&1 && terser --compress --mangle -- $< >$@ || echo "terser  command not found, skipped."
 
-public/js/serviceworker.min.js: public/js/serviceworker.js
+public/serviceworker.min.js: public/serviceworker.js
 	@type terser >/dev/null 2>&1 && terser --compress --mangle -- $< >$@ || echo "terser  command not found, skipped."
 
 clean:

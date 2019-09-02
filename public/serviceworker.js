@@ -3,6 +3,10 @@ self.addEventListener('install', function(e) {
     caches.open('anony-store').then(function(cache) {
       return cache.addAll([
         '/',
+        '/manifest.json',
+        '/robots.txt',
+        '/sitemap.xml',
+        '/serviceworker.min.js',
         '/assets/octicons-4.3.0/octicons.min.css',
         '/assets/octicons-4.3.0/octicons.woff2',
         '/css/anony.min.css',
@@ -13,9 +17,6 @@ self.addEventListener('install', function(e) {
         '/js/jdenticon-2.2.0.min.js',
         '/js/jquery-3.4.1.min.js',
         '/js/semantic-2.4.2.min.js',
-        '/js/serviceworker.min.js',
-        '/robots.txt',
-        '/sitemap.xml',
       ]);
     })
   );
