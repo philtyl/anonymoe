@@ -5,6 +5,7 @@ import (
 	"os"
 	"path"
 	"regexp"
+	"strings"
 
 	"github.com/go-xorm/xorm"
 	_ "github.com/mattn/go-sqlite3"
@@ -38,6 +39,9 @@ func init() {
 	cleaner = &Cleaner{
 		tags: map[string]*regexp.Regexp{
 			"div": regexp.MustCompile(`(?s)<div(.*?)</div>`),
+		},
+		replace: map[string]string{
+			"http://": "https://",
 		},
 	}
 }
@@ -80,7 +84,8 @@ func NewEngine() (err error) {
 }
 
 type Cleaner struct {
-	tags map[string]*regexp.Regexp
+	tags    map[string]*regexp.Regexp
+	replace map[string]string
 }
 
 func (c *Cleaner) clean(s string) string {
@@ -98,5 +103,10 @@ func (c *Cleaner) clean(s string) string {
 			s = undoMatcheTags.ReplaceAllString(s, fmt.Sprintf("<%s$1</%s>", search, search))
 		}
 	}
+
+	for find, replace := range c.replace {
+		s = strings.ReplaceAll(s, find, replace)
+	}
+
 	return s
 }
