@@ -1,0 +1,16 @@
+{
+  "name": "Anonymoe Mailbox",
+  "short_name": "Anonymoe",
+  "description": "An open source anonymous password-less email client",
+  "icons": [
+    {
+      "src": "img/logo.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    }
+  ],
+  "start_url": "/",
+  "display": "fullscreen",
+  "background_color": "#FFFFFF",
+  "theme_color": "#FFFFFF"
+}

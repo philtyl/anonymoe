@@ -57,3 +57,9 @@ function refreshInboxFeed() {
         err.print();
     }
 }
+
+if('serviceWorker' in navigator) {
+    navigator.serviceWorker
+        .register('/js/serviceworker.min.js')
+        .then(function() { console.log('Service Worker Registered'); });
+}
