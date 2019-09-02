@@ -9,7 +9,7 @@ $(document).ready(function () {
 });
 
 function registerClipBoard() {
-    if ($('.clipboard'.length === 0)) {
+    if ($('.clipboard-btn'.length === 0)) {
         return;
     }
 
