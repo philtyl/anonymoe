@@ -13,7 +13,7 @@ function registerClipBoard() {
         return;
     }
 
-    const clipboard = new ClipboardJS('.clipboard');
+    const clipboard = new ClipboardJS('.clipboard-btn');
     clipboard.on('success', function (e) {
         const caller = $('#' + e.trigger.getAttribute('id'));
         e.clearSelection();
