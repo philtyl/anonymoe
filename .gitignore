@@ -2,3 +2,6 @@
 .idea
 /pkg/bindata/
 /public/css/anony.css
+/public/css/anony.min.css
+/public/js/anony.min.js
+/public/js/anony.min.js.map
