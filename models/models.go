@@ -40,9 +40,10 @@ func init() {
 		tags: map[string]*regexp.Regexp{
 			"div": regexp.MustCompile(`(?s)<div(.*?)</div>`),
 		},
-		replace: map[string]string{
-			"http://": "https://",
-		},
+		replace: map[string]string{},
+	}
+	if setting.Config.Protocol == "https" {
+		cleaner.replace["http://"] = "https://"
 	}
 }
 
