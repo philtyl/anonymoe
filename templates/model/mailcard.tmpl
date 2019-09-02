@@ -1,16 +1,14 @@
 {{- /*gotype: github.com/philtyl/anonymoe/models.Mail*/ -}}
-<div class="ui card">
-    <div class="ui content">
-        <div class="ui grid">
-            <div class="ui five wide column header">
-                <svg class="basic icon avatar image" data-jdenticon-value="{{.From}}"></svg>
-                {{.From}}
-            </div>
-            <div class="nine wide column header"><h2>{{.Subject}}</h2></div>
-            <div class="two wide column header right aligned floated">{{HumanTimeSince .SentUnix}}</div>
-        </div>
-    </div>
-    <div class="content very padded text">
+<div class="ui raised segments">
+    <h4 class="ui top attached header">{{.Subject}}</h4>
+    <div class="ui attached segment">
         {{Str2HTML .Body}}
+    </div>
+    <div class="ui bottom attached info message">
+        <a href="mailto:{{.From}}" class="ui image label">
+            <svg class="ui basic icon avatar" data-jdenticon-value="{{.From}}"></svg>
+            {{.From}}
+        </a>
+        <div class="ui label">{{HumanTimeSince .SentUnix}}</div>
     </div>
 </div>

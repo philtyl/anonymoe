@@ -87,7 +87,7 @@ func createMail(e *xorm.Session, raw *RawMailItem) (_ *Mail, _ []MailRecipient, 
 			log.Warn("Both HTMLBody and TextBody are not able to be parsed, ignoring: %v", err)
 			return
 		}
-		body = string(bytesBody)
+		body = fmt.Sprintf("<p>%s</p>", string(bytesBody))
 	} else {
 		body = strings.ReplaceAll(body, "<img src=\"cid:", fmt.Sprintf("<img src=\"%s/inbox/embed/%d/", setting.Config.AppURL, mailItem.Id))
 	}
