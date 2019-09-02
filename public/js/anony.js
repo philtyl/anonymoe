@@ -9,11 +9,11 @@ $(document).ready(function () {
 });
 
 function registerClipBoard() {
-    if ($('.clipboard-btn'.length === 0)) {
+    if ($('#clipboard-btn').length === 0) {
         return;
     }
 
-    const clipboard = new ClipboardJS('.clipboard-btn');
+    const clipboard = new ClipboardJS('.clipboard');
     clipboard.on('success', function (e) {
         const caller = $('#' + e.trigger.getAttribute('id'));
         e.clearSelection();
