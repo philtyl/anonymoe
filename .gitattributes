@@ -1,0 +1,4 @@
+public/assets/* linguist-vendored
+public/css/* linguist-vendored
+public/js/* linguist-vendored
+public/js/anony.js linguist-vendored=false
